@@ -1,0 +1,14 @@
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bin\Debug\resources.pri
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bin\Debug\AppxManifest.xml
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bin\Debug\Connect More.build.appxrecipe
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\priconfig.xml
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\layout.resfiles
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\resources.resfiles
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\pri.resfiles
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\LanguageQualifiers.txt
+c:\users\micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bld\Debug\ProjectArchitectures.txt
+C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bld\Debug\priconfig.xml.intermediate
+C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bld\Debug\layout.resfiles.intermediate
+C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bld\Debug\resources.resfiles.intermediate
+C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bld\Debug\pri.resfiles.intermediate
+C:\Users\Micheal\documents\visual studio 2012\Projects\Connect More\Connect More\bin\Debug\MicrosoftAdvertising.winmd

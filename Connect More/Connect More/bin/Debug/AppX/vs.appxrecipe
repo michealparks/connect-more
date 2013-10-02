@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Machine>MICHEAL-PC</Machine>
+    <WindowsUser>Micheal</WindowsUser>
+    <SolutionConfiguration>Debug|AnyCPU</SolutionConfiguration>
+    <PackageArchitecture>neutral</PackageArchitecture>
+    <RegisteredManifestChecksum>E6EB6D910A4CFD229A764B60CE5F6279DA63404C15FBE766C9545B0E4AF72249</RegisteredManifestChecksum>
+    <RegisteredPackageMoniker>30385MichealParks.ConnectMore_2.0.0.0_neutral__cyzzft7dpfbjr</RegisteredPackageMoniker>
+    <RegisteredUserModeAppID>30385MichealParks.ConnectMore_cyzzft7dpfbjr!App</RegisteredUserModeAppID>
+    <RegisteredPackageID>30385MichealParks.ConnectMore</RegisteredPackageID>
+    <RegisteredPackagePublisher>CN=8AB51DC0-3CFC-42D6-9EC2-77EB0292BE5D</RegisteredPackagePublisher>
+    <RegisteredVersion>2.0.0.0</RegisteredVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppXManifest Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bin\Debug\AppxManifest.xml">
+      <PackagePath>AppxManifest.xml</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T02:49:26.728</Modified>
+    </AppXManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\References\CommonConfiguration\neutral\MicrosoftAdvertising.winmd">
+      <PackagePath>MicrosoftAdvertising.winmd</PackagePath>
+      <Modified>2013-06-29T16:51:44.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\debug\neutral\MSAdvertisingJS\ads\ad.js">
+      <PackagePath>MSAdvertisingJS\ads\ad.js</PackagePath>
+      <Modified>2013-06-29T16:49:54.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\CommonConfiguration\neutral\MSAdvertisingJS\ads\bootstrap.js">
+      <PackagePath>MSAdvertisingJS\ads\bootstrap.js</PackagePath>
+      <Modified>2013-06-29T16:49:40.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\CommonConfiguration\neutral\MSAdvertisingJS\ads\ormma.js">
+      <PackagePath>MSAdvertisingJS\ads\ormma.js</PackagePath>
+      <Modified>2013-06-29T16:49:40.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\CommonConfiguration\neutral\MSAdvertisingJS\ads\bootstrap.html">
+      <PackagePath>MSAdvertisingJS\ads\bootstrap.html</PackagePath>
+      <Modified>2013-06-29T16:48:10.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\CommonConfiguration\neutral\MSAdvertisingJS\ads\MSASettingsPanel.html">
+      <PackagePath>MSAdvertisingJS\ads\MSASettingsPanel.html</PackagePath>
+      <Modified>2013-06-29T16:48:12.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\debug\neutral\MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol.icon.12x12.png">
+      <PackagePath>MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol.icon.12x12.png</PackagePath>
+      <Modified>2013-06-29T16:48:10.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\debug\neutral\MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol.icon.16x16.png">
+      <PackagePath>MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol.icon.16x16.png</PackagePath>
+      <Modified>2013-06-29T16:48:10.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\MSAdvertisingJS\6.1\Redist\debug\neutral\MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol_oam.xml">
+      <PackagePath>MSAdvertisingJS\ads\metadata\microsoftnsjs.advertising.adcontrol_oam.xml</PackagePath>
+      <Modified>2013-06-29T16:48:10.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\logo.scale-100.png">
+      <PackagePath>images\logo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:35:26.908</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\logo.scale-140.png">
+      <PackagePath>images\logo.scale-140.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:30:17.987</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\logo.scale-180.png">
+      <PackagePath>images\logo.scale-180.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:29:46.515</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\logo.scale-80.png">
+      <PackagePath>images\logo.scale-80.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:32:17.617</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.scale-100.png">
+      <PackagePath>images\smalllogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:38:03.841</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.scale-140.png">
+      <PackagePath>images\smalllogo.scale-140.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:37:49.230</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.scale-180.png">
+      <PackagePath>images\smalllogo.scale-180.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:37:38.567</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.scale-80.png">
+      <PackagePath>images\smalllogo.scale-80.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:38:14.357</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.targetsize-16.png">
+      <PackagePath>images\smalllogo.targetsize-16.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:39:04.813</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.targetsize-256.png">
+      <PackagePath>images\smalllogo.targetsize-256.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:38:28.928</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.targetsize-32.png">
+      <PackagePath>images\smalllogo.targetsize-32.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:38:53.372</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\smalllogo.targetsize-48.png">
+      <PackagePath>images\smalllogo.targetsize-48.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:38:40.788</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\splashscreen.scale-100.png">
+      <PackagePath>images\splashscreen.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:51:48.713</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\splashscreen.scale-140.png">
+      <PackagePath>images\splashscreen.scale-140.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:51:37.443</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\splashscreen.scale-180.png">
+      <PackagePath>images\splashscreen.scale-180.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:51:24.466</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\storelogo.scale-100.png">
+      <PackagePath>images\storelogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:36:49.591</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\storelogo.scale-140.png">
+      <PackagePath>images\storelogo.scale-140.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:36:37.627</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\storelogo.scale-180.png">
+      <PackagePath>images\storelogo.scale-180.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:36:18.542</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\WideLogo.scale-100.png">
+      <PackagePath>images\WideLogo.scale-100.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:50:34.809</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\WideLogo.scale-140.png">
+      <PackagePath>images\WideLogo.scale-140.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:50:19.112</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\WideLogo.scale-180.png">
+      <PackagePath>images\WideLogo.scale-180.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:50:02.245</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\images\WideLogo.scale-80.png">
+      <PackagePath>images\WideLogo.scale-80.png</PackagePath>
+      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
+      <Modified>2013-09-30T01:50:53.155</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\privacy.html">
+      <PackagePath>privacy.html</PackagePath>
+      <Modified>2013-08-10T22:13:19.878</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\default.html">
+      <PackagePath>default.html</PackagePath>
+      <Modified>2013-10-02T02:58:41.354</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\css\priv.css">
+      <PackagePath>css\priv.css</PackagePath>
+      <Modified>2013-09-30T00:20:09.099</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\css\raedix-login.css">
+      <PackagePath>css\raedix-login.css</PackagePath>
+      <Modified>2013-09-30T00:32:37.628</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\css\default.css">
+      <PackagePath>css\default.css</PackagePath>
+      <Modified>2013-09-30T00:32:12.918</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\geddes.otf">
+      <PackagePath>geddes.otf</PackagePath>
+      <Modified>2013-09-06T23:34:30.740</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\js\blowfish.js">
+      <PackagePath>js\blowfish.js</PackagePath>
+      <Modified>2013-09-05T02:15:18.433</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\js\default.js">
+      <PackagePath>js\default.js</PackagePath>
+      <Modified>2013-10-02T03:04:23.934</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\js\jquery-2.0.3.min.js">
+      <PackagePath>js\jquery-2.0.3.min.js</PackagePath>
+      <Modified>2013-09-05T02:13:03.403</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\js\Raedix.js">
+      <PackagePath>js\Raedix.js</PackagePath>
+      <Modified>2013-09-30T00:31:25.593</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\Micheal\Documents\Visual Studio 2012\Projects\Connect More\Connect More\bin\Debug\resources.pri">
+      <PackagePath>resources.pri</PackagePath>
+      <Modified>2013-09-30T01:52:54.046</Modified>
+    </AppxPackagedFile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResolvedSDKReference Include="C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\Microsoft.WinJS.1.0\1.0\">
+      <Name>Microsoft.WinJS.1.0</Name>
+      <Version>1.0.9200.20789</Version>
+      <Architecture>Neutral</Architecture>
+      <FrameworkIdentity>Name=Microsoft.WinJS.1.0, MinVersion=1.0.9200.20789</FrameworkIdentity>
+      <AppxLocation>C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0\ExtensionSDKs\Microsoft.WinJS.1.0\1.0\Microsoft.WinJS.1.0.appx</AppxLocation>
+    </ResolvedSDKReference>
+  </ItemGroup>
+</Project>

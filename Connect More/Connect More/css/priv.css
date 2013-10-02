@@ -1,0 +1,48 @@
+﻿#priv #radix-logo {
+	margin-top : -40px;
+	width      : 377.047px;
+	height     : 233.983px;
+	-webkit-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1); /* older webkit */
+	-webkit-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	   -moz-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	    -ms-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	     -o-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	        transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); /* custom */
+}
+
+#priv #privacy-policy {
+	background-color : #489060;
+	width            : 600px;
+	margin-top       : 30px;
+	border-radius    : 20px;
+	border-bottom    : 5px solid #3A754E;
+	-webkit-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1); /* older webkit */
+	-webkit-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	   -moz-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	    -ms-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	     -o-transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); 
+	        transition: all 1.2s cubic-bezier(0.205, 0.935, 0.655, 1.005); /* custom */
+}
+
+#priv #title {
+	font-size   : 50px;
+	font-weight : 500;
+	padding     : 10px 0 0 0;
+}
+
+#priv #content {
+	font-size : 20px;
+	padding   : 0 20px 20px 20px;
+}
+
+#priv footer {
+	position         : absolute;
+	left             : 50%;
+	margin-left      : -50px;
+	padding          : 5px;
+	border-radius    : 7px;
+	border-bottom    : 5px solid #3A754E;
+	background-color : #489060;
+	width            : 100px;
+	bottom           : 10px;
+}
