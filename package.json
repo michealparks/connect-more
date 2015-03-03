@@ -1,0 +1,16 @@
+{
+  "name": "connect-more",
+  "repository": "pixbi/sdk",
+  "description": "An expansion of the classic game.",
+  "dependencies": {
+    "gulp": "*",
+    "gulp-babel": "*",
+    "gulp-concat": "*",
+    "gulp-add-src": "*",
+    "gulp-uglify": "*",
+    "gulp-stylus": "*",
+    "nib": "*",
+    "gulp-jade": "*",
+    "gulp-webserver": "*"
+  }
+}

@@ -1,0 +1,17 @@
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.DS_Store
+
+/public/
+/build/
+/components/
+/tmp/
+/node_modules/
+/deprecated/
+
+/.c9/
