@@ -57,6 +57,7 @@ function onStartGame() {
 }
 
 function init(sound) {
+  console.log('here')
   React.render(
     <Splashscreen />,
     document.querySelector('#splashscreen-container')
@@ -71,9 +72,5 @@ function init(sound) {
   );
 }
 
-//const gameController = new GameController(getGameConfig());
-
 const sound = new Sound(init);
-
-window.sound = sound
 

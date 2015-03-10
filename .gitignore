@@ -8,7 +8,6 @@
 *.DS_Store
 
 /public/
-/build/
 /components/
 /tmp/
 /node_modules/
