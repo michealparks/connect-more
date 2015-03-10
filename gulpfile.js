@@ -18,6 +18,8 @@ var jade = require('gulp-jade');
 // Server
 var webserver = require('gulp-webserver');
 
+var dest;
+
 gulp.task('javascript', function () {
   gulp.src(['app/**/*.js'])
     .pipe(babel({modules: 'amd', moduleIds: true}))
@@ -43,7 +45,7 @@ gulp.task('css', function () {
 gulp.task('jade', function () {
   gulp.src(['app/**/*.jade'])
     .pipe(jade({}))
-    .pipe(gulp.dest('build'));
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('uglify', function () {
@@ -53,7 +55,7 @@ gulp.task('uglify', function () {
 });
 
 gulp.task('webserver', function () {
-  gulp.src('build')
+  gulp.src('./')
     .pipe(webserver({
       livereload: true,
       host: '0.0.0.0',
@@ -63,8 +65,10 @@ gulp.task('webserver', function () {
     }));
 });
 
+gulp.task('gh-pages')
+
 var mainTasks = ['javascript', 'css', 'jade'];
 
 gulp.task('watch', function () { gulp.watch('app/**', mainTasks); });
-gulp.task('build', mainTasks.concat(['uglify']));
+gulp.task('build', mainTasks.concat(['uglify', 'gh-pages']));
 gulp.task('default', mainTasks.concat(['webserver', 'watch']));

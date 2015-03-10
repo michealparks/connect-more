@@ -17,16 +17,17 @@ Audio.prototype.fadeOut = function() {
 
 export default class Sound {
   constructor(done) {
-    this.background = new Audio('bach.mp3');
+    this.background = new Audio('./build/bach.mp3');
     this.moveSound  = new Audio('http://javanese.imslp.info/files/imglnks/usimg/3/3f/IMSLP83273-PMLP151919-bach_bwv1006.mp3');
 
     this.background.volume = 0.4;
+    console.log('doop')
 
-    this.background.oncanplaythrough = () => {
+    this.background.addEventListener('canplaythrough', () => {
       done(this);
       this.background.currentTime = 1.8;
       this.background.play();
-    };
+    });
 
   }
 
