@@ -1,7 +1,103 @@
 @import 'nib'
 
+$ease = cubic-bezier(0.075, 0.820, 0.165, 1.000)
+
 #menu
   absolute top left
   size 100% 100%
+  
+  &.settings
+    > #title
+    #btn-play
+    #btn-settings
+      transition 700ms $ease !important
+      transform translate(-180%) !important
+      
+    #btn-play
+      transition-delay 0 !important
+    
+    #btn-settings
+      transition-delay 100ms !important
+      
+    #title
+      transition-delay 200ms !important
+      
+    > #settings
+      transition-delay 200ms !important
+      transform none
+      opacity 1
+      pointer-events auto
+  
+  > #title
+  > #settings
+  #btn-play
+  #btn-settings
+    background-color alpha(white, 0.93)
+    box-shadow 1px 4px 30px 5px alpha(black, 0.5)
+  
+  > #title
+  > #settings
+    perspective 600px
+    z-index 1
+    absolute top 50% left 50%
+    size 500px 200px
+    line-height 250px
+    margin -100px -250px
+    text-align center
+    font-family 'Great Vibes', cursive
+    font-size 80px
+    
+    transition transform 15000ms $ease, opacity 6000ms
+    transform scale(0.5)
+    opacity 0
+    
+    &:before
+      content 'You are cordially invited to'
+      position absolute 
+      top -70px
+      font-family 'Great Vibes', cursive
+      font-size 26px
+    
+    &.active
+      transform scale(1)
+      opacity 1
+      
+      #btn-play
+      #btn-settings
+        transform none
+        
+  > #settings
+    line-height 50px
+    font-family Source Sans Pro
+    transition transform 600ms $ease, opacity 600ms
+    transform translate(100%)
+    
+    &:before
+      content 'Limit three guests.'
+      
+  #btn-play
+  #btn-settings
+    cursor pointer
+    line-height 70px
+    font-size 34px
+    
+    transition 600ms $ease
+    backface-visibility hidden
+    transform-origin 50% 0
+    transform rotateX(-90deg)
+      
+  #btn-play
+    absolute bottom -80px left
+    padding 0 60px
+    transition-delay 4000ms
+    
+  #btn-settings
+    absolute bottom -80px right
+    padding 0 66px
+    transition-delay 5000ms
+    
+
+    
+    
   
   

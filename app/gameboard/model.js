@@ -14,18 +14,18 @@ export default React.createClass({
   },
 
   render() {
+    const columns = this.props.grid.data.map((column, i) =>
+      <GameboardColumn 
+        key={i}
+        id={i}
+        data={column}
+        height={column.length} 
+        tileSize={this.props.tileSize} />
+    );
+
     return (
       <section style={this.state.style} id='gameboard'>
-        {this.props.grid.data.map((column, i) => {
-          return (
-            <GameboardColumn 
-              key={i}
-              id={i}
-              data={column}
-              height={column.length} 
-              tileSize={this.props.tileSize} />
-          );
-        })}
+        {columns}
         <GameboardSurface 
           width={this.props.grid.columns}
           tileSize={this.props.tileSize} />

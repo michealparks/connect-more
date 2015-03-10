@@ -9,15 +9,20 @@ export default class GameController {
   constructor(config) {
     this.grid = new Grid(config.grid);
     this.tileSize = window.innerWidth/this.grid.columns;
-    this.players = config.players.map((config, i) => { 
-      config.index = i;
-      return new Player(config); 
-    });
+
+    if (this.tileSize > 30) this.tileSize = 30;
+
+    this.players = config.players.map((config) => new Player(config));
     this.player = this.players[0];
 
     subscribe('Column::ptrup', this.onPlayerMove.bind(this));
 
     this.update();
+
+    window.addEventListener('resize', () => {
+      this.tileSize = window.innerWidth/this.grid.columns;
+      this.update();
+    });
   }
 
   onPlayerMove(column) {
@@ -28,7 +33,7 @@ export default class GameController {
 
     this.update();
 
-    for (let i = 0; this.nextPlayer().type == 'AI'; i++) {
+    while (this.nextPlayer().type == 'AI') {
       this.player
         .beginMove()
         .decideMove(this.grid, this.players)
@@ -45,8 +50,6 @@ export default class GameController {
   }
 
   update() {
-
-
     React.render(
       <Gameboard grid={this.grid} tileSize={this.tileSize} />,
       document.querySelector('#gameboard-container')

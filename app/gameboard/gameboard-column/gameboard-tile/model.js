@@ -22,7 +22,10 @@ export default React.createClass({
           }}
           className='shadow'></div>
         <div 
-          style={this.state.style}
+          style={{
+            width: `${this.props.tileSize-14}px`,
+            height: `${this.props.tileSize-14}px`
+          }}
           className={`piece ${this.props.playerClass}`}></div>
 
       </div>

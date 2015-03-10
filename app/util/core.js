@@ -14,12 +14,6 @@ export default {
 
   randomInt(min, max) {
     return Math.floor(min+Math.random()*(max-min+1))
-  },
-
-  log(arr) {
-    let HTML = document.querySelector('#log');
-    HTML.innerHTML = '';
-    arr.forEach((item) => { HTML.innerHTML += `${item}, `; });
   }
 
 };

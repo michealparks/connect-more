@@ -20,21 +20,21 @@ export default React.createClass({
   },
 
   render() {
+    const tiles = this.props.data.map((tile, i) => 
+      <GameboardTile 
+        key={i}
+        tileSize={this.props.tileSize}
+        playerClass={tile > -1? `p-${tile}`: ''} />
+    );
+
     return (
       <div 
         onMouseUp={this.onPtrUp}
         onTouchEnd={this.onPtrUp}
         id={this.props.id}
         style={this.state.style}
-        className={`gameboard-column`} >
-        {this.props.data.map((tile, i) => {
-          return (
-            <GameboardTile 
-              key={i} 
-              tileSize={this.props.tileSize}
-              playerClass={tile > -1? `p-${tile}`: ''} />
-          );
-        })}
+        className={'gameboard-column'} >
+        {tiles}
       </div>
     );
   }

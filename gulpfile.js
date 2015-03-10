@@ -21,6 +21,10 @@ var webserver = require('gulp-webserver');
 gulp.task('javascript', function () {
   gulp.src(['app/**/*.js'])
     .pipe(babel({modules: 'amd', moduleIds: true}))
+      .on('error', function (e) {
+        console.error(e.message);
+        this.emit('end');
+      })
     .pipe(addsrc.prepend('lib/almond.js'))
     .pipe(addsrc.prepend('lib/react-with-addons.js'))
     .pipe(addsrc.prepend('lib/polyfill.js'))

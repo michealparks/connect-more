@@ -1,5 +1,10 @@
 @import 'nib';
 
+$red    = #e74c3c
+$blue   = #3498db
+$green  = #1abc9c
+$orange = #e67e22
+
 .gameboard-tile
   position      relative
   color         blue
@@ -21,10 +26,20 @@
       transform-origin          50%
       
     &.p-0
-      background-color red
+      background-color $red
+      border 7px solid lighten($red, 20%)
       
     &.p-1
-      background-color blue
+      background-color $blue
+      border 7px solid lighten($blue, 20%)
+      
+    &.p-2
+      background-color $green
+      border 7px solid lighten($green ,20%)
+      
+    &.p-3
+      background-color $orange
+      border 7px solid lighten($orange ,20%)
       
   .shadow
     absolute top 5px left 5px
