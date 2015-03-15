@@ -1,57 +1,68 @@
-import {randomInt} from 'util/core'
-
-Audio.prototype.fadeOut = function() {
-  function fade() {
-    if (this.volume - 0.05 >= 0) {
+Audio.prototype.fadeOut = function(done) {
+  let fade = () => {
+    if (this.volume - 0.01 <= 0) {
       this.volume = 0;
-      return;
+      return done();
     }
 
     if (this.volume >= 0) this.volume -= 0.05;
 
-    window.setTimeout(fade, 25);
+    window.setTimeout(fade, 1000/16);
   }
 
-  window.setTimeout(fade, 25);
+  window.setTimeout(fade, 1000/16);
 }
 
 export default class Sound {
   constructor(done) {
-    this.background = new Audio('./build/bach.mp3');
-    this.moveSound  = new Audio('http://javanese.imslp.info/files/imglnks/usimg/3/3f/IMSLP83273-PMLP151919-bach_bwv1006.mp3');
+    this.menuBackground = new Audio('./build/Brandenburg Concerto No. 3 in G major, BWV1048 I ,  Allegro.mp3');
+    this.gameBackground = new Audio('./build/Brandenburg Concerto No. 4 in G major, BWV1049 I , Allegro.mp3');
+    this.loseBackground = new Audio('./build/Brandenburg Concerto No. 4 in G major, BWV1049 II , Andante.mp3');
+    this.winBackground  = new Audio('./build/Brandenburg Concerto No. 1 in F major, BWV1046 III , Allegro.mp3');
 
-    this.background.volume = 0.4;
-    console.log('doop')
+    this.hitEffect   = new Audio('./build/Hit.mp3');
+    this.clickEffect = new Audio('./build/Click.mp3')
 
-    this.background.addEventListener('canplaythrough', () => {
+    this.menuBackground.volume = 0.4;
+    this.gameBackground.volume = 0.4;
+    this.loseBackground.volume = 0.4;
+
+    this.hitEffect.volume = 0.4;
+
+    this.playing  = null;
+    this.disabled = false;
+
+    this.menuBackground.addEventListener('canplaythrough', () => {
+      this.menuBackground.play();
+      this.playing = this.menuBackground;
       done(this);
-      this.background.currentTime = 1.8;
-      this.background.play();
     });
-
   }
 
-  playRandMove() {
-    this.moveSound.volume = 0
-    this.moveSound.currentTime = randomInt(0, 180);
+  play(type) {
+    if (this.disabled) return;
 
-    let id1, id2;
+    this.playing.fadeOut(() => {
+      this[type].play()
+      this.playing = this[type];
+    });
+  }
 
-    function int1() {
-      this.moveSound.volume += 0.05;
-      if (this.moveSound.volume > 0.4) {
-        window.clearInterval(id1);
-        id2 = window.setInterval(int2, 30);
-      }
-    }
-
-    function int2() {
-      this.moveSound.volume -= 0.05;
-      if (this.moveSound.volume <= 0) {
-        window.clearInterval(id2)
-      }
-    }
-
-    id1 = setInterval(int1, 30);
+  playHitEffect() {
+    window.setTimeout(() => {
+      this.hitEffect.volume = 0.2;
+      this.hitEffect.currentTime = 0;
+      this.hitEffect.play();
+    }, 500);
+    window.setTimeout(() => {
+      this.hitEffect.volume = 0.1;
+      this.hitEffect.currentTime = 0;
+      this.hitEffect.play();
+    }, 900);
+    window.setTimeout(() => {
+      this.hitEffect.volume = 0.05;
+      this.hitEffect.currentTime = 0;
+      this.hitEffect.play();
+    }, 1100);
   }
 }

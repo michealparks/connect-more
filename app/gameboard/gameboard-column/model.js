@@ -7,11 +7,23 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      style: {
-        height: `${this.props.tileSize * this.props.height}px`, 
-        width: `${this.props.tileSize}px`
-      }
+      hovered: -1
     };
+  },
+
+  onMouseOver() {
+    const columnData = this.props.data;
+    let i = columnData.length;
+    while (i-- > 0) {
+      if (columnData[i] == -1) {
+        return this.setState({hovered: i});
+      }
+    }
+    this.setState({hovered: -1});
+  },
+
+  onMouseLeave() {
+    this.setState({hovered: -1});
   },
 
   onPtrUp(e) {
@@ -23,17 +35,23 @@ export default React.createClass({
     const tiles = this.props.data.map((tile, i) => 
       <GameboardTile 
         key={i}
+        className={this.state.hovered == i? 'hovered': ''}
         tileSize={this.props.tileSize}
         playerClass={tile > -1? `p-${tile}`: ''} />
     );
 
     return (
       <div 
+        onMouseOver={this.onMouseOver}
+        onMouseLeave={this.onMouseLeave}
         onMouseUp={this.onPtrUp}
         onTouchEnd={this.onPtrUp}
         id={this.props.id}
-        style={this.state.style}
-        className={'gameboard-column'} >
+        style={{
+          height: `${this.props.tileSize * this.props.height}px`, 
+          width: `${this.props.tileSize}px`
+        }}
+        className={`gameboard-column`} >
         {tiles}
       </div>
     );

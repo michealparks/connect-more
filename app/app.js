@@ -43,23 +43,14 @@ function onSettingsChange(config = {}) {
 
 onSettingsChange();
 
-function onStartGame() {
-  React.unmountComponentAtNode(
-    document.querySelector('#splashscreen-container')
-  );
-  React.unmountComponentAtNode(
-    document.querySelector('#menu-container')
-  );
-
-
-  gameController = new GameController(gameSettings);
+function onStartGame(sound) {
+  gameController = new GameController(gameSettings, sound);
   document.body.classList.add('in-game');
 }
 
 function init(sound) {
-  console.log('here')
   React.render(
-    <Splashscreen />,
+    <Splashscreen state={'visible'} />,
     document.querySelector('#splashscreen-container')
   );
 

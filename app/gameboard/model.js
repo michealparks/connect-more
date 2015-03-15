@@ -5,10 +5,14 @@ export default React.createClass({
   displayName: 'Gameboard',
 
   getInitialState() {
+    const width = this.props.grid.columns * this.props.tileSize;
+    const height = this.props.grid.rows * this.props.tileSize;
     return {
       style: {
-        width: `${this.props.grid.columns * this.props.tileSize}px`,
-        height: `${this.props.grid.rows * this.props.tileSize}px`
+        width: `${width}px`,
+        height: `${height}px`,
+        margin: `0 -${width/2}px`,
+        left: `50%`
       }
     }
   },

@@ -6,14 +6,15 @@ import {subscribe} from 'util/mediator';
 
 export default React.createClass({
   displayName: 'Splashscreen',
-  timeoutId: null,
+  resizeId: null,
+  addPieceId: null,
   players: [],
   player: null,
 
   getInitialState() {
     const grid = new Grid({rows: 10});
     return {
-      grid: grid,
+      grid,
       tileSize: window.innerWidth/grid.columns
     };
   },
@@ -26,18 +27,18 @@ export default React.createClass({
       });
     };
 
-    this.players = [0, 1, 2, 3].map((i) => new Player({ index: i })); 
-    this.player = this.players[0];
-
     window.addEventListener('resize', () => {
-      if (this.timeoutId) {
-        window.clearTimeout(this.timeoutId);
-        this.timeoutId = null
-      }
-      this.timeoutId = window.setTimeout(onResize, 400);
+      this.resizeId && window.clearTimeout(this.resizeId);
+      this.resizeId = window.setTimeout(onResize, 400);
     });
 
-    window.setTimeout(this.addRandomPiece, 100);
+    this.initFauxGame();
+    this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
+  },
+
+  initFauxGame() {
+    this.players = [0, 1, 2, 3].map((i) => new Player({ index: i })); 
+    this.player = this.players[0];
   },
 
   addRandomPiece() {
@@ -50,8 +51,7 @@ export default React.createClass({
 
     if (this.state.grid.isFilled()) return;
 
-
-    window.setTimeout(this.addRandomPiece, 100);
+    this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
   },
 
   nextPlayer() {
@@ -62,7 +62,7 @@ export default React.createClass({
 
   render() {
     return (
-      <div id='splashscreen'>
+      <div id='splashscreen' className={this.props.state}>
         <Gameboard grid={this.state.grid} tileSize={this.state.tileSize} />
       </div>
     );

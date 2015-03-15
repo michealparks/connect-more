@@ -29,15 +29,14 @@ gulp.task('javascript', function () {
       })
     .pipe(addsrc.prepend('lib/almond.js'))
     .pipe(addsrc.prepend('lib/react-with-addons.js'))
-    .pipe(addsrc.prepend('lib/polyfill.js'))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('build'));
 });
 
 gulp.task('css', function () {
-  gulp.src(['app/**/!(variables)*.styl'])
+  gulp.src(['app/**/!(variables|mixins)*.styl'])
+    .pipe(addsrc.prepend('app/styl/*(mixins|variables).styl'))
     .pipe(concat('app.styl'))
-    .pipe(addsrc.prepend('app/styl/variables.styl'))
     .pipe(stylus({use: nib(), compress: true}))
     .pipe(gulp.dest('build'));
 });
@@ -65,10 +64,9 @@ gulp.task('webserver', function () {
     }));
 });
 
-gulp.task('gh-pages')
 
 var mainTasks = ['javascript', 'css', 'jade'];
 
-gulp.task('watch', function () { gulp.watch('app/**', mainTasks); });
+gulp.task('watch', function () { gulp.watch(['./app/**'], [mainTasks]); });
 gulp.task('build', mainTasks.concat(['uglify', 'gh-pages']));
 gulp.task('default', mainTasks.concat(['webserver', 'watch']));

@@ -1,4 +1,3 @@
-
 /**
  * React (with addons) v0.12.2
  */
@@ -20306,17 +20305,13 @@ define("app", ["exports", "splashscreen/model", "menu/model", "game-controller/m
 
   onSettingsChange();
 
-  function onStartGame() {
-    React.unmountComponentAtNode(document.querySelector("#splashscreen-container"));
-    React.unmountComponentAtNode(document.querySelector("#menu-container"));
-
-    gameController = new GameController(gameSettings);
+  function onStartGame(sound) {
+    gameController = new GameController(gameSettings, sound);
     document.body.classList.add("in-game");
   }
 
   function init(sound) {
-    console.log("here");
-    React.render(React.createElement(Splashscreen, null), document.querySelector("#splashscreen-container"));
+    React.render(React.createElement(Splashscreen, { state: "visible" }), document.querySelector("#splashscreen-container"));
 
     React.render(React.createElement(Menu, {
       sound: sound,
@@ -20346,15 +20341,16 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
   var Grid = _interopRequire(_gridModel);
 
   var GameController = (function () {
-    function GameController(config) {
+    function GameController(config, sound) {
       var _this = this;
 
       _classCallCheck(this, GameController);
 
       this.grid = new Grid(config.grid);
       this.tileSize = window.innerWidth / this.grid.columns;
+      this.sound = sound;
 
-      if (this.tileSize > 30) this.tileSize = 30;
+      if (this.tileSize > 100) this.tileSize = 100;
 
       this.players = config.players.map(function (config) {
         return new Player(config);
@@ -20363,10 +20359,12 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
       subscribe("Column::ptrup", this.onPlayerMove.bind(this));
 
+      this.sound.play("gameBackground");
       this.update();
 
       window.addEventListener("resize", function () {
         _this.tileSize = window.innerWidth / _this.grid.columns;
+        if (_this.tileSize > 100) _this.tileSize = 100;
         _this.update();
       });
     }
@@ -20374,15 +20372,25 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
     _prototypeProperties(GameController, null, {
       onPlayerMove: {
         value: function onPlayerMove(column) {
+          var _this = this;
+
+          this.sound.playHitEffect();
           this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
 
           this.update();
 
-          while (this.nextPlayer().type == "AI") {
-            this.player.beginMove().decideMove(this.grid, this.players).endMove(this.grid);
+          var computerMove = function () {
+            if (_this.nextPlayer().type == "AI") {
+              _this.sound.playHitEffect();
+              _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
 
-            this.update();
-          }
+              _this.update();
+
+              window.setTimeout(computerMove, 1000);
+            }
+          };
+
+          window.setTimeout(computerMove, 1000);
         },
         writable: true,
         configurable: true
@@ -20422,10 +20430,14 @@ define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/mod
     displayName: "Gameboard",
 
     getInitialState: function getInitialState() {
+      var width = this.props.grid.columns * this.props.tileSize;
+      var height = this.props.grid.rows * this.props.tileSize;
       return {
         style: {
-          width: "" + this.props.grid.columns * this.props.tileSize + "px",
-          height: "" + this.props.grid.rows * this.props.tileSize + "px"
+          width: "" + width + "px",
+          height: "" + height + "px",
+          margin: "0 -" + width / 2 + "px",
+          left: "50%"
         }
       };
     },
@@ -20683,8 +20695,7 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
     },
 
     play: function play() {
-      this.props.onStartGame();
-      this.props.sound.background.fadeOut();
+      this.props.onStartGame(this.props.sound);
     },
 
     settings: function settings() {
@@ -20889,28 +20900,28 @@ define("player/model", ["exports", "module", "util/core"], function (exports, mo
 
   module.exports = Player;
 });
-define("sound/model", ["exports", "module", "util/core"], function (exports, module, _utilCore) {
+define("sound/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
   var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-  var randomInt = _utilCore.randomInt;
+  Audio.prototype.fadeOut = function (done) {
+    var _this = this;
 
-  Audio.prototype.fadeOut = function () {
-    function fade() {
-      if (this.volume - 0.05 >= 0) {
-        this.volume = 0;
-        return;
+    var fade = function () {
+      if (_this.volume - 0.01 <= 0) {
+        _this.volume = 0;
+        return done();
       }
 
-      if (this.volume >= 0) this.volume -= 0.05;
+      if (_this.volume >= 0) _this.volume -= 0.05;
 
-      window.setTimeout(fade, 25);
-    }
+      window.setTimeout(fade, 1000 / 16);
+    };
 
-    window.setTimeout(fade, 25);
+    window.setTimeout(fade, 1000 / 16);
   };
 
   var Sound = (function () {
@@ -20919,44 +20930,64 @@ define("sound/model", ["exports", "module", "util/core"], function (exports, mod
 
       _classCallCheck(this, Sound);
 
-      this.background = new Audio("./build/bach.mp3");
-      this.moveSound = new Audio("http://javanese.imslp.info/files/imglnks/usimg/3/3f/IMSLP83273-PMLP151919-bach_bwv1006.mp3");
+      this.menuBackground = new Audio("./build/Brandenburg Concerto No. 3 in G major, BWV1048 I ,  Allegro.mp3");
+      this.gameBackground = new Audio("./build/Brandenburg Concerto No. 4 in G major, BWV1049 I , Allegro.mp3");
+      this.loseBackground = new Audio("./build/Brandenburg Concerto No. 4 in G major, BWV1049 II , Andante.mp3");
+      this.winBackground = new Audio("./build/Brandenburg Concerto No. 1 in F major, BWV1046 III , Allegro.mp3");
 
-      this.background.volume = 0.4;
-      console.log("doop");
+      this.hitEffect = new Audio("./build/Hit.mp3");
+      this.clickEffect = new Audio("./build/Click.mp3");
 
-      this.background.addEventListener("canplaythrough", function () {
+      this.menuBackground.volume = 0.4;
+      this.gameBackground.volume = 0.4;
+      this.loseBackground.volume = 0.4;
+
+      this.hitEffect.volume = 0.4;
+
+      this.playing = null;
+      this.disabled = false;
+
+      this.menuBackground.addEventListener("canplaythrough", function () {
+        _this.menuBackground.play();
+        _this.playing = _this.menuBackground;
         done(_this);
-        _this.background.currentTime = 1.8;
-        _this.background.play();
       });
     }
 
     _prototypeProperties(Sound, null, {
-      playRandMove: {
-        value: function playRandMove() {
-          this.moveSound.volume = 0;
-          this.moveSound.currentTime = randomInt(0, 180);
+      play: {
+        value: function play(type) {
+          var _this = this;
 
-          var id1 = undefined,
-              id2 = undefined;
+          if (this.disabled) {
+            return;
+          }this.playing.fadeOut(function () {
+            _this[type].play();
+            _this.playing = _this[type];
+          });
+        },
+        writable: true,
+        configurable: true
+      },
+      playHitEffect: {
+        value: function playHitEffect() {
+          var _this = this;
 
-          function int1() {
-            this.moveSound.volume += 0.05;
-            if (this.moveSound.volume > 0.4) {
-              window.clearInterval(id1);
-              id2 = window.setInterval(int2, 30);
-            }
-          }
-
-          function int2() {
-            this.moveSound.volume -= 0.05;
-            if (this.moveSound.volume <= 0) {
-              window.clearInterval(id2);
-            }
-          }
-
-          id1 = setInterval(int1, 30);
+          window.setTimeout(function () {
+            _this.hitEffect.volume = 0.2;
+            _this.hitEffect.currentTime = 0;
+            _this.hitEffect.play();
+          }, 500);
+          window.setTimeout(function () {
+            _this.hitEffect.volume = 0.1;
+            _this.hitEffect.currentTime = 0;
+            _this.hitEffect.play();
+          }, 900);
+          window.setTimeout(function () {
+            _this.hitEffect.volume = 0.05;
+            _this.hitEffect.currentTime = 0;
+            _this.hitEffect.play();
+          }, 1100);
         },
         writable: true,
         configurable: true
@@ -20982,7 +21013,8 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
   var subscribe = _utilMediator.subscribe;
   module.exports = React.createClass({
     displayName: "Splashscreen",
-    timeoutId: null,
+    resizeId: null,
+    addPieceId: null,
     players: [],
     player: null,
 
@@ -21004,20 +21036,20 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
         });
       };
 
+      window.addEventListener("resize", function () {
+        _this.resizeId && window.clearTimeout(_this.resizeId);
+        _this.resizeId = window.setTimeout(onResize, 400);
+      });
+
+      this.initFauxGame();
+      this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
+    },
+
+    initFauxGame: function initFauxGame() {
       this.players = [0, 1, 2, 3].map(function (i) {
         return new Player({ index: i });
       });
       this.player = this.players[0];
-
-      window.addEventListener("resize", function () {
-        if (_this.timeoutId) {
-          window.clearTimeout(_this.timeoutId);
-          _this.timeoutId = null;
-        }
-        _this.timeoutId = window.setTimeout(onResize, 400);
-      });
-
-      window.setTimeout(this.addRandomPiece, 100);
     },
 
     addRandomPiece: function addRandomPiece() {
@@ -21027,7 +21059,7 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
 
       if (this.state.grid.isFilled()) {
         return;
-      }window.setTimeout(this.addRandomPiece, 100);
+      }this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
     },
 
     nextPlayer: function nextPlayer() {
@@ -21038,7 +21070,7 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
     render: function render() {
       return React.createElement(
         "div",
-        { id: "splashscreen" },
+        { id: "splashscreen", className: this.props.state },
         React.createElement(Gameboard, { grid: this.state.grid, tileSize: this.state.tileSize })
       );
     }
@@ -21209,11 +21241,23 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
 
     getInitialState: function getInitialState() {
       return {
-        style: {
-          height: "" + this.props.tileSize * this.props.height + "px",
-          width: "" + this.props.tileSize + "px"
-        }
+        hovered: -1
       };
+    },
+
+    onMouseOver: function onMouseOver() {
+      var columnData = this.props.data;
+      var i = columnData.length;
+      while (i-- > 0) {
+        if (columnData[i] == -1) {
+          return this.setState({ hovered: i });
+        }
+      }
+      this.setState({ hovered: -1 });
+    },
+
+    onMouseLeave: function onMouseLeave() {
+      this.setState({ hovered: -1 });
     },
 
     onPtrUp: function onPtrUp(e) {
@@ -21228,6 +21272,7 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
       var tiles = this.props.data.map(function (tile, i) {
         return React.createElement(GameboardTile, {
           key: i,
+          className: _this.state.hovered == i ? "hovered" : "",
           tileSize: _this.props.tileSize,
           playerClass: tile > -1 ? "p-" + tile : "" });
       });
@@ -21235,10 +21280,15 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
       return React.createElement(
         "div",
         {
+          onMouseOver: this.onMouseOver,
+          onMouseLeave: this.onMouseLeave,
           onMouseUp: this.onPtrUp,
           onTouchEnd: this.onPtrUp,
           id: this.props.id,
-          style: this.state.style,
+          style: {
+            height: "" + this.props.tileSize * this.props.height + "px",
+            width: "" + this.props.tileSize + "px"
+          },
           className: "gameboard-column" },
         tiles
       );
@@ -21403,27 +21453,21 @@ define("gameboard/gameboard-column/gameboard-tile/model", ["exports", "module"],
   module.exports = React.createClass({
     displayName: "GameboardTile",
 
-    getInitialState: function getInitialState() {
-      return {
-        style: {
-          height: "" + this.props.tileSize + "px",
-          width: "" + this.props.tileSize + "px"
-        }
-      };
-    },
-
     render: function render() {
       return React.createElement(
         "div",
         {
-          style: this.state.style,
+          style: {
+            width: "" + this.props.tileSize + "px",
+            height: "" + this.props.tileSize + "px"
+          },
           className: "" + this.props.playerClass + " gameboard-tile" },
         React.createElement("div", {
           style: {
             width: "" + (this.props.tileSize - 10) + "px",
             height: "" + (this.props.tileSize - 10) + "px"
           },
-          className: "shadow" }),
+          className: "" + this.props.className + " shadow" }),
         React.createElement("div", {
           style: {
             width: "" + (this.props.tileSize - 14) + "px",

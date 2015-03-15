@@ -1,17 +1,14 @@
 @import 'nib'
 
-$ease = cubic-bezier(0.075, 0.820, 0.165, 1.000)
-
 #menu
-  absolute top left
-  size 100% 100%
+  fullSize()
   
   &.settings
     > #title
     #btn-play
     #btn-settings
       transition 700ms $ease !important
-      transform translate(-180%) !important
+      transform translate(-200%) !important
       
     #btn-play
       transition-delay 0 !important

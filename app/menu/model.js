@@ -14,8 +14,7 @@ export default React.createClass({
   },
 
   play() {
-    this.props.onStartGame();
-    this.props.sound.background.fadeOut();
+    this.props.onStartGame(this.props.sound);
   },
 
   settings() {

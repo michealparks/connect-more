@@ -6,26 +6,31 @@ import Gameboard   from 'gameboard/model';
 import Grid        from 'grid/model';
 
 export default class GameController {
-  constructor(config) {
+  constructor(config, sound) {
     this.grid = new Grid(config.grid);
     this.tileSize = window.innerWidth/this.grid.columns;
+    this.sound = sound;
 
-    if (this.tileSize > 30) this.tileSize = 30;
+    if (this.tileSize > 100) this.tileSize = 100;
 
     this.players = config.players.map((config) => new Player(config));
     this.player = this.players[0];
 
     subscribe('Column::ptrup', this.onPlayerMove.bind(this));
 
+    this.sound.play('gameBackground');
     this.update();
 
     window.addEventListener('resize', () => {
       this.tileSize = window.innerWidth/this.grid.columns;
+      if (this.tileSize > 100) this.tileSize = 100;
       this.update();
     });
   }
 
   onPlayerMove(column) {
+    this.sound
+      .playHitEffect();
     this.player
       .beginMove()
       .makeMove(this.grid, column)
@@ -33,14 +38,22 @@ export default class GameController {
 
     this.update();
 
-    while (this.nextPlayer().type == 'AI') {
-      this.player
-        .beginMove()
-        .decideMove(this.grid, this.players)
-        .endMove(this.grid);
+    let computerMove = () => {
+      if (this.nextPlayer().type == 'AI') {
+        this.sound
+          .playHitEffect();
+        this.player
+          .beginMove()
+          .decideMove(this.grid, this.players)
+          .endMove(this.grid);
 
-      this.update();
+        this.update();
+
+        window.setTimeout(computerMove, 1000);
+      }
     }
+
+    window.setTimeout(computerMove, 1000);
   }
 
   nextPlayer() {
