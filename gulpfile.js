@@ -18,8 +18,6 @@ var jade = require('gulp-jade');
 // Server
 var webserver = require('gulp-webserver');
 
-var dest;
-
 gulp.task('javascript', function () {
   gulp.src(['app/**/*.js'])
     .pipe(babel({modules: 'amd', moduleIds: true}))

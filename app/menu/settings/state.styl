@@ -8,16 +8,31 @@
     pointer-events auto
   
   #num-connect
-    for num in (3..5)
-      &[data-num='num'] .option:nth-child(num-2) 
+    &[data-num='3'] .option:nth-child(1) 
         background-color alpha(black, 0.1)
+    &[data-num='4'] .option:nth-child(2) 
+        background-color alpha(black, 0.1)
+    &[data-num='5'] .option:nth-child(3) 
+      background-color alpha(black, 0.1)
           
   #num-human-players
-    for num in (1..4)
-      &[data-num='num'] .option:nth-child(num)
+    &[data-num='1'] .option:nth-child(1)
+        background-color alpha(black, 0.1)
+    &[data-num='2'] .option:nth-child(2)
+        background-color alpha(black, 0.1)
+    &[data-num='3'] .option:nth-child(3)
+        background-color alpha(black, 0.1)
+    &[data-num='4'] .option:nth-child(4)
+        background-color alpha(black, 0.1)
+    &[data-num='5'] .option:nth-child(5)
         background-color alpha(black, 0.1)
         
   #num-computer-players
-    for num in (0..3)
-      &[data-num=num] .option:nth-child(num+1)
+    &[data-num='0'] .option:nth-child(1)
+        background-color alpha(black, 0.1)
+    &[data-num='1'] .option:nth-child(2)
+        background-color alpha(black, 0.1)
+    &[data-num='2'] .option:nth-child(3)
+        background-color alpha(black, 0.1)
+    &[data-num='3'] .option:nth-child(4)
         background-color alpha(black, 0.1)

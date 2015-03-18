@@ -8,6 +8,8 @@ const menuNode = document.querySelector('#menu-container');
 let gameSettings;
 let gameController;
 
+React.initializeTouchEvents(true)
+
 function onSettingsChange(config = {}) {
   gameSettings = {
     grid: {

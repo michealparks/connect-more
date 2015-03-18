@@ -3,6 +3,18 @@
 #menu
   fullSize()
   
+  &.intro
+    
+    > #title
+    > #settings
+      transition transform 15000ms $ease, opacity 6000ms
+      
+    #btn-play
+      transition-delay 4000ms
+      
+    #btn-settings
+      transition-delay 5000ms
+  
   &.settings
     > #title
     #btn-play
@@ -27,8 +39,10 @@
   
   > #title
   > #settings
+  > #settings:before
   #btn-play
   #btn-settings
+  #btn-ammend
     background-color alpha(white, 0.93)
     box-shadow 1px 4px 30px 5px alpha(black, 0.5)
   
@@ -43,8 +57,8 @@
     text-align center
     font-family 'Great Vibes', cursive
     font-size 80px
+    transition transform 300ms $ease, opacity 300ms
     
-    transition transform 15000ms $ease, opacity 6000ms
     transform scale(0.5)
     opacity 0
     
@@ -74,6 +88,7 @@
       
   #btn-play
   #btn-settings
+  #btn-ammend
     cursor pointer
     line-height 70px
     font-size 34px
@@ -84,14 +99,15 @@
     transform rotateX(-90deg)
       
   #btn-play
+  #btn-ammend
     absolute bottom -80px left
     padding 0 60px
-    transition-delay 4000ms
+    
     
   #btn-settings
     absolute bottom -80px right
     padding 0 66px
-    transition-delay 5000ms
+    
     
 
     

@@ -7,7 +7,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      hovered: -1
+      hovered: this.props.hovered || -1
     };
   },
 
@@ -26,9 +26,11 @@ export default React.createClass({
     this.setState({hovered: -1});
   },
 
-  onPtrUp(e) {
-    if (this.props.data.indexOf(-1) == -1) return;
-    publish('Column::ptrup', parseInt(e.currentTarget.id, 10));
+  onMouseUp(e) {
+    if (window.ontouchstart === undefined) {
+      if (this.props.data.indexOf(-1) == -1) return;
+      publish('Column::ptrup', parseInt(e.currentTarget.id, 10));
+    }
   },
 
   render() {
@@ -43,9 +45,9 @@ export default React.createClass({
     return (
       <div 
         onMouseOver={this.onMouseOver}
+        onTouchStart={this.onMouseOver}
         onMouseLeave={this.onMouseLeave}
-        onMouseUp={this.onPtrUp}
-        onTouchEnd={this.onPtrUp}
+        onMouseUp={this.onMouseUp}
         id={this.props.id}
         style={{
           height: `${this.props.tileSize * this.props.height}px`, 

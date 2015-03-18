@@ -1,6 +1,8 @@
 import GameboardSurface from 'gameboard/gameboard-surface/model';
 import GameboardColumn  from 'gameboard/gameboard-column/model';
 
+import {publish}        from 'util/mediator';
+
 export default React.createClass({
   displayName: 'Gameboard',
 
@@ -13,8 +15,30 @@ export default React.createClass({
         height: `${height}px`,
         margin: `0 -${width/2}px`,
         left: `50%`
-      }
+      },
+      hovered: -1
     }
+  },
+
+  onTouchMove(e) {
+    let target = e.target;
+    while (target.className !== 'gameboard-column') {
+      target = target.parentNode;
+      if (target == null) return;
+    }
+  },
+
+  onTouchEnd(e) {
+    let target = e.target;
+    while (target.className !== 'gameboard-column') {
+      target = target.parentNode;
+      if (target == null) return;
+    }
+
+    const id = parseInt(target.id, 10);
+
+    if (this.props.grid.data[id].indexOf(-1) == -1) return;
+    publish('Column::ptrup', parseInt(id, 10));
   },
 
   render() {
@@ -28,7 +52,11 @@ export default React.createClass({
     );
 
     return (
-      <section style={this.state.style} id='gameboard'>
+      <section 
+        style={this.state.style} 
+        id='gameboard'
+        onTouchMove={this.onTouchMove}
+        onTouchEnd={this.onTouchEnd}>
         {columns}
         <GameboardSurface 
           width={this.props.grid.columns}

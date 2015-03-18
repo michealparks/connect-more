@@ -5,7 +5,7 @@ export default React.createClass({
 
   getInitialState() {
     return {
-      menuState: ''
+      menuState: 'intro'
     };
   },
 
@@ -18,7 +18,9 @@ export default React.createClass({
   },
 
   settings() {
-    this.setState({menuState: 'settings'});
+    this.setState({
+      menuState: this.state.menuState == 'settings'? '': 'settings'
+    });
   },
 
   render() {
@@ -29,7 +31,7 @@ export default React.createClass({
           <div onClick={this.play} id='btn-play'>I accept</div>
           <div onClick={this.settings} id='btn-settings'>Arrangements</div>
         </div>
-        <Settings onSettingsChange={this.props.onSettingsChange} />
+        <Settings onSubmit={this.settings} onSettingsChange={this.props.onSettingsChange} />
       </div>
     );
   }

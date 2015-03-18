@@ -1,18 +1,33 @@
 #settings
   fullSize()
   background-color alpha(black, 0.5)
+
+  &:before
+    padding 5px 30px
   
   .container
   .title
   .option
+    user-select none
     position relative
     
   .title
   .option
     display inline-block
     
+  .container:first-child
+    margin-top 7.5px
+    
   .title
-    font-size 14px
+    margin 0 10px
+    font-size 20px
     
   .option
-    size 30px 30px
+    cursor pointer
+    size 35px 55px
+    font-size 60px
+    transition 300ms
+    
+  #btn-ammend
+    font-family 'Great Vibes', cursive
+    transform none

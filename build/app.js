@@ -20267,6 +20267,8 @@ define("app", ["exports", "splashscreen/model", "menu/model", "game-controller/m
   var gameSettings = undefined;
   var gameController = undefined;
 
+  React.initializeTouchEvents(true);
+
   function onSettingsChange() {
     var config = arguments[0] === undefined ? {} : arguments[0];
 
@@ -20417,7 +20419,7 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
   module.exports = GameController;
 });
-define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model"], function (exports, module, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel) {
+define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -20426,6 +20428,7 @@ define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/mod
 
   var GameboardColumn = _interopRequire(_gameboardGameboardColumnModel);
 
+  var publish = _utilMediator.publish;
   module.exports = React.createClass({
     displayName: "Gameboard",
 
@@ -20438,8 +20441,35 @@ define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/mod
           height: "" + height + "px",
           margin: "0 -" + width / 2 + "px",
           left: "50%"
-        }
+        },
+        hovered: -1
       };
+    },
+
+    onTouchMove: function onTouchMove(e) {
+      var target = e.target;
+      while (target.className !== "gameboard-column") {
+        target = target.parentNode;
+        if (target == null) {
+          return;
+        }
+      }
+    },
+
+    onTouchEnd: function onTouchEnd(e) {
+      var target = e.target;
+      while (target.className !== "gameboard-column") {
+        target = target.parentNode;
+        if (target == null) {
+          return;
+        }
+      }
+
+      var id = parseInt(target.id, 10);
+
+      if (this.props.grid.data[id].indexOf(-1) == -1) {
+        return;
+      }publish("Column::ptrup", parseInt(id, 10));
     },
 
     render: function render() {
@@ -20456,7 +20486,11 @@ define("gameboard/model", ["exports", "module", "gameboard/gameboard-surface/mod
 
       return React.createElement(
         "section",
-        { style: this.state.style, id: "gameboard" },
+        {
+          style: this.state.style,
+          id: "gameboard",
+          onTouchMove: this.onTouchMove,
+          onTouchEnd: this.onTouchEnd },
         columns,
         React.createElement(GameboardSurface, {
           width: this.props.grid.columns,
@@ -20684,7 +20718,7 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
 
     getInitialState: function getInitialState() {
       return {
-        menuState: ""
+        menuState: "intro"
       };
     },
 
@@ -20699,7 +20733,9 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
     },
 
     settings: function settings() {
-      this.setState({ menuState: "settings" });
+      this.setState({
+        menuState: this.state.menuState == "settings" ? "" : "settings"
+      });
     },
 
     render: function render() {
@@ -20721,7 +20757,7 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
             "Arrangements"
           )
         ),
-        React.createElement(Settings, { onSettingsChange: this.props.onSettingsChange })
+        React.createElement(Settings, { onSubmit: this.settings, onSettingsChange: this.props.onSettingsChange })
       );
     }
   });
@@ -21241,7 +21277,7 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
 
     getInitialState: function getInitialState() {
       return {
-        hovered: -1
+        hovered: this.props.hovered || -1
       };
     },
 
@@ -21260,10 +21296,12 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
       this.setState({ hovered: -1 });
     },
 
-    onPtrUp: function onPtrUp(e) {
-      if (this.props.data.indexOf(-1) == -1) {
-        return;
-      }publish("Column::ptrup", parseInt(e.currentTarget.id, 10));
+    onMouseUp: function onMouseUp(e) {
+      if (window.ontouchstart === undefined) {
+        if (this.props.data.indexOf(-1) == -1) {
+          return;
+        }publish("Column::ptrup", parseInt(e.currentTarget.id, 10));
+      }
     },
 
     render: function render() {
@@ -21281,9 +21319,9 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
         "div",
         {
           onMouseOver: this.onMouseOver,
+          onTouchStart: this.onMouseOver,
           onMouseLeave: this.onMouseLeave,
-          onMouseUp: this.onPtrUp,
-          onTouchEnd: this.onPtrUp,
+          onMouseUp: this.onMouseUp,
           id: this.props.id,
           style: {
             height: "" + this.props.tileSize * this.props.height + "px",
@@ -21324,10 +21362,6 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
       };
     },
 
-    componentDidUpdate: function componentDidUpdate() {
-      this.props.onSettingsChange(this.state);
-    },
-
     changeConnect: function changeConnect(e) {
       this.setState({
         numConnect: e.target.textContent - 0
@@ -21339,16 +21373,16 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
       var comps = this.state.numComputers;
       var humans = this.state.numHumans;
 
-      switch (e.target.className) {
+      switch (e.target.classList[1]) {
         case "num-human-players":
           this.setState({
             numHumans: num,
-            numComputers: comps > 2 && num > 2 ? Math.abs(comps - 4) : num < 2 && comps < 1 ? 1 : comps
+            numComputers: comps + num > 4 ? 4 - num : num < 2 && comps < 1 ? 1 : comps
           });
           break;
         case "num-computer-players":
           this.setState({
-            numHumans: humans > 2 && num > 2 ? 1 : num < 1 ? 2 : humans,
+            numHumans: humans + num > 4 ? 4 - num : humans,
             numComputers: num
           });
           break;
@@ -21357,91 +21391,105 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
       }
     },
 
+    onSubmit: function onSubmit() {
+      this.props.onSettingsChange(this.state);
+      this.props.onSubmit();
+    },
+
     render: function render() {
       return React.createElement(
         "div",
         { id: "settings" },
         React.createElement(
           "div",
-          { id: "num-connect", className: "container", "data-num": this.state.numConnect },
+          null,
           React.createElement(
-            "span",
-            { onClick: this.changeConnect, className: "option num-connect" },
-            "3"
+            "div",
+            { id: "num-connect", className: "container", "data-num": this.state.numConnect },
+            React.createElement(
+              "span",
+              { onClick: this.changeConnect, className: "option num-connect" },
+              "3"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changeConnect, className: "option num-connect" },
+              "4"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changeConnect, className: "option num-connect" },
+              "5"
+            ),
+            React.createElement(
+              "span",
+              { className: "title" },
+              "to Connect"
+            )
           ),
           React.createElement(
-            "span",
-            { onClick: this.changeConnect, className: "option num-connect" },
-            "4"
+            "div",
+            { id: "num-human-players", className: "container", "data-num": this.state.numHumans },
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              "1"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              "2"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              "3"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              "4"
+            ),
+            React.createElement(
+              "span",
+              { className: "title" },
+              "Human Players"
+            )
           ),
           React.createElement(
-            "span",
-            { onClick: this.changeConnect, className: "option num-connect" },
-            "5"
-          ),
-          React.createElement(
-            "span",
-            { className: "title" },
-            "to Connect"
+            "div",
+            { id: "num-computer-players", className: "container", "data-num": this.state.numComputers },
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              "0"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              "1"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              "2"
+            ),
+            React.createElement(
+              "span",
+              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              "3"
+            ),
+            React.createElement(
+              "span",
+              { className: "title" },
+              "Computer Players"
+            )
           )
         ),
         React.createElement(
           "div",
-          { id: "num-human-players", className: "container", "data-num": this.state.numHumans },
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-human-players" },
-            "1"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-human-players" },
-            "2"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-human-players" },
-            "3"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-human-players" },
-            "4"
-          ),
-          React.createElement(
-            "span",
-            { className: "title" },
-            "Human Players"
-          )
-        ),
-        React.createElement(
-          "div",
-          { id: "num-computer-players", className: "container", "data-num": this.state.numComputers },
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-computer-players" },
-            "0"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-computer-players" },
-            "1"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-computer-players" },
-            "2"
-          ),
-          React.createElement(
-            "span",
-            { onClick: this.changePlayerNum, className: "option num-computer-players" },
-            "3"
-          ),
-          React.createElement(
-            "span",
-            { className: "title" },
-            "Computer Players"
-          )
+          { id: "btn-ammend", onClick: this.onSubmit },
+          "Ammend registry"
         )
       );
     }
