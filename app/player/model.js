@@ -5,11 +5,11 @@ export default class Player {
   constructor(config) {
     this.index = config.index;
     this.name  = config.name || `Player ${this.index+1}`;
-    this.type  = config.type || 'AI';
+    this.type  = config.type || 'computer';
     this.moves = [];
     this.longestChains = [];
 
-    if (this.type !== 'AI') return;
+    if (this.type !== 'computer') return;
 
     this.difficulty = config.difficulty;
     this.errorFactor = 0.1 * util.randomFloat(

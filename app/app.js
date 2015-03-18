@@ -8,23 +8,20 @@ import Sound          from 'sound/model'
 const ls = window.localStorage;
 
 let gameSettings;
-let gameController;
 
 React.initializeTouchEvents(true)
 
 init();
 
 subscribe('Player::win', (player) => {
-  if (player.type == 'AI') {
+  if (player.type == 'computer') {
     Sound.play('loseBackground');
   } else {
     Sound.play('winBackground');
   }
 });
 
-subscribe('Game::restart', () => {
-  onStartGame();
-});
+subscribe('Game::restart', onStartGame);
 
 subscribe('Game::end', () => {
   document.body.classList.remove('in-game');
@@ -68,7 +65,7 @@ function onSettingsChange(config = {}) {
       }
 
       for (let i = 0; i < computers; i++) {
-        players.push(new Player(players.length, 'AI', 'impossible'));
+        players.push(new Player(players.length, 'computer', 'impossible'));
       }
 
       return players;
@@ -78,8 +75,7 @@ function onSettingsChange(config = {}) {
 }
 
 function onStartGame() {
-
-  gameController = new GameController(gameSettings, Sound);
+  GameController.newGame(gameSettings);
   document.body.classList.add('in-game');
 }
 

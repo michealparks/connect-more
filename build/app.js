@@ -20267,23 +20267,20 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
   var ls = window.localStorage;
 
   var gameSettings = undefined;
-  var gameController = undefined;
 
   React.initializeTouchEvents(true);
 
   init();
 
   subscribe("Player::win", function (player) {
-    if (player.type == "AI") {
+    if (player.type == "computer") {
       Sound.play("loseBackground");
     } else {
       Sound.play("winBackground");
     }
   });
 
-  subscribe("Game::restart", function () {
-    onStartGame();
-  });
+  subscribe("Game::restart", onStartGame);
 
   subscribe("Game::end", function () {
     document.body.classList.remove("in-game");
@@ -20329,7 +20326,7 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
         }
 
         for (var i = 0; i < computers; i++) {
-          players.push(new Player(players.length, "AI", "impossible"));
+          players.push(new Player(players.length, "computer", "impossible"));
         }
 
         return players;
@@ -20338,8 +20335,7 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
   }
 
   function onStartGame() {
-
-    gameController = new GameController(gameSettings, Sound);
+    GameController.newGame(gameSettings);
     document.body.classList.add("in-game");
   }
 
@@ -20376,25 +20372,13 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
   var Sound = _interopRequire(_soundModel);
 
   var GameController = (function () {
-    function GameController(config, sound) {
+    function GameController(config) {
       var _this = this;
 
       _classCallCheck(this, GameController);
 
-      this.grid = new Grid(config.grid);
-      this.tileSize = window.innerWidth / this.grid.columns;
-
-      if (this.tileSize > 100) this.tileSize = 100;
-
-      this.players = config.players.map(function (config) {
-        return new Player(config);
-      });
-      this.player = this.players[0];
-
       subscribe("Column::ptrup", this.onPlayerMove.bind(this));
-
-      Sound.play("gameBackground");
-      this.update();
+      subscribe("Player:win", this.onPlayerWin.bind(this));
 
       window.addEventListener("resize", function () {
         _this.tileSize = window.innerWidth / _this.grid.columns;
@@ -20404,6 +20388,31 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
     }
 
     _prototypeProperties(GameController, null, {
+      newGame: {
+        value: function newGame(config) {
+          this.grid = new Grid(config.grid);
+          this.tileSize = window.innerWidth / this.grid.columns;
+          this.hasEnded = false;
+          this.players = config.players.map(function (config) {
+            return new Player(config);
+          });
+          this.player = this.players[0];
+
+          if (this.tileSize > 100) this.tileSize = 100;
+
+          Sound.play("gameBackground");
+          this.update();
+        },
+        writable: true,
+        configurable: true
+      },
+      onPlayerWin: {
+        value: function onPlayerWin() {
+          this.hasEnded = true;
+        },
+        writable: true,
+        configurable: true
+      },
       onPlayerMove: {
         value: function onPlayerMove(column) {
           var _this = this;
@@ -20412,23 +20421,29 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
           this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
 
           this.update();
-          this.nextPlayer();
 
-          var computerMove = function () {
-            Sound.playHitEffect();
-            _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
+          window.setTimeout(function () {
+            if (_this.hasEnded) return;
 
-            _this.update();
             _this.nextPlayer();
 
-            if (_this.player.type == "AI") {
+            var computerMove = function () {
+              Sound.playHitEffect();
+              _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
+
+              _this.update();
+              _this.nextPlayer();
+
+              if (_this.player.type == "computer") {
+                window.setTimeout(computerMove, 1000);
+              }
+            };
+
+            console.log(_this.player.type);
+            if (_this.player.type == "computer") {
               window.setTimeout(computerMove, 1000);
             }
-          };
-
-          if (this.player.type == "AI") {
-            window.setTimeout(computerMove, 1000);
-          }
+          }, 300);
         },
         writable: true,
         configurable: true
@@ -20453,7 +20468,7 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
     return GameController;
   })();
 
-  module.exports = GameController;
+  module.exports = new GameController();
 });
 define("gameboard/model", ["exports", "module", "gameboard/winner-message/model", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
   "use strict";
@@ -20820,11 +20835,11 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
       this.index = config.index;
       this.name = config.name || "Player " + (this.index + 1);
-      this.type = config.type || "AI";
+      this.type = config.type || "computer";
       this.moves = [];
       this.longestChains = [];
 
-      if (this.type !== "AI") {
+      if (this.type !== "computer") {
         return;
       }this.difficulty = config.difficulty;
       this.errorFactor = 0.1 * util.randomFloat(this.difficulty == "easy" ? 6.66 : this.difficulty == "medium" ? 3.33 : 0, this.difficulty == "easy" ? 10 : this.difficulty == "medium" ? 6.66 : 3.33);
