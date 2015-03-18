@@ -2,12 +2,26 @@ export default React.createClass({
   displayName: 'Settings',
 
   getInitialState() {
+    const ls  = window.localStorage;
+    const nC  = ls.getItem('connectMore_numConnect')   || 4;
+    const nH  = ls.getItem('connectMore_numHumans')    || 1;
+    const nAI = ls.getItem('connectMore_numComputers') || 1;
+    const nP  = ls.getItem('connectMore_numPlayers')   || 2;
+
     return {
-      numConnect: 4,
-      numHumans: 1,
-      numComputers: 1,
-      numPlayers: 2
+      numConnect: nC - 0,
+      numHumans: nH - 0,
+      numComputers: nAI - 0,
+      numPlayers: nP - 0
     };
+  },
+
+  componentDidUpdate() {
+    const ls = window.localStorage;
+    ls.setItem('connectMore_numConnect', this.state.numConnect);
+    ls.setItem('connectMore_numHumans', this.state.numHumans);
+    ls.setItem('connectMore_numComputers', this.state.numComputers);
+    ls.setItem('connectMore_numPlayers', this.state.numPlayers);
   },
 
   changeConnect(e) {

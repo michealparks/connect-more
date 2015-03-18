@@ -1,3 +1,4 @@
+import WinnerMessage    from 'gameboard/winner-message/model';
 import GameboardSurface from 'gameboard/gameboard-surface/model';
 import GameboardColumn  from 'gameboard/gameboard-column/model';
 
@@ -61,6 +62,7 @@ export default React.createClass({
         <GameboardSurface 
           width={this.props.grid.columns}
           tileSize={this.props.tileSize} />
+        <WinnerMessage sound={this.props.sound} />
       </section>
     );
   }

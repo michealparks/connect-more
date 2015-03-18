@@ -4,12 +4,12 @@ import {subscribe} from 'util/mediator'
 import Player      from 'player/model';
 import Gameboard   from 'gameboard/model';
 import Grid        from 'grid/model';
+import Sound       from 'sound/model';
 
 export default class GameController {
   constructor(config, sound) {
     this.grid = new Grid(config.grid);
     this.tileSize = window.innerWidth/this.grid.columns;
-    this.sound = sound;
 
     if (this.tileSize > 100) this.tileSize = 100;
 
@@ -18,7 +18,7 @@ export default class GameController {
 
     subscribe('Column::ptrup', this.onPlayerMove.bind(this));
 
-    this.sound.play('gameBackground');
+    Sound.play('gameBackground');
     this.update();
 
     window.addEventListener('resize', () => {
@@ -29,31 +29,33 @@ export default class GameController {
   }
 
   onPlayerMove(column) {
-    this.sound
-      .playHitEffect();
+    Sound.playHitEffect();
     this.player
       .beginMove()
       .makeMove(this.grid, column)
       .endMove(this.grid);
 
     this.update();
+    this.nextPlayer();
 
     let computerMove = () => {
-      if (this.nextPlayer().type == 'AI') {
-        this.sound
-          .playHitEffect();
-        this.player
-          .beginMove()
-          .decideMove(this.grid, this.players)
-          .endMove(this.grid);
+      Sound.playHitEffect();
+      this.player
+        .beginMove()
+        .decideMove(this.grid, this.players)
+        .endMove(this.grid);
 
-        this.update();
+      this.update();
+      this.nextPlayer();
 
+      if (this.player.type == 'AI') {
         window.setTimeout(computerMove, 1000);
       }
     }
 
-    window.setTimeout(computerMove, 1000);
+    if (this.player.type == 'AI') {
+      window.setTimeout(computerMove, 1000);
+    }
   }
 
   nextPlayer() {
@@ -64,7 +66,7 @@ export default class GameController {
 
   update() {
     React.render(
-      <Gameboard grid={this.grid} tileSize={this.tileSize} />,
+      <Gameboard sound={Sound} grid={this.grid} tileSize={this.tileSize} />,
       document.querySelector('#gameboard-container')
     );
   }

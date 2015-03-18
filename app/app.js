@@ -1,21 +1,55 @@
+import {subscribe}    from 'util/mediator';
+ 
 import Splashscreen   from 'splashscreen/model';
 import Menu           from 'menu/model';
 import GameController from 'game-controller/model';
 import Sound          from 'sound/model'
 
-const menuNode = document.querySelector('#menu-container');
+const ls = window.localStorage;
 
 let gameSettings;
 let gameController;
 
 React.initializeTouchEvents(true)
 
+init();
+
+subscribe('Player::win', (player) => {
+  if (player.type == 'AI') {
+    Sound.play('loseBackground');
+  } else {
+    Sound.play('winBackground');
+  }
+});
+
+subscribe('Game::restart', () => {
+  onStartGame();
+});
+
+subscribe('Game::end', () => {
+  document.body.classList.remove('in-game');
+  document.querySelector('#menu').classList.add('intro');
+
+  React.unmountComponentAtNode(
+    document.querySelector('#splashscreen-container')
+  );
+
+  init();
+});
+
+onSettingsChange({
+  numConnect: (ls.getItem('connectMore_numConnect') || 4) - 0,
+  numHumans: (ls.getItem('connectMore_numHumans') || 1) - 0,
+  numComputers: (ls.getItem('connectMore_numComputers') || 1) - 0,
+  numPlayers: (ls.getItem('connectMore_numPlayers') || 2) - 0
+});
+
 function onSettingsChange(config = {}) {
   gameSettings = {
     grid: {
       columns: 7,
       rows: 6,
-      nConnect: config.numConnect || 4
+      nConnect: config.numConnect
     },
     players: (() => {
 
@@ -25,8 +59,8 @@ function onSettingsChange(config = {}) {
         this.difficulty = difficulty;
       }
 
-      const humans = config.numHumans || 1
-      const computers = config.numComputers || 1
+      const humans = config.numHumans
+      const computers = config.numComputers
       const players = [];
 
       for (let i = 0; i < humans; i++) {
@@ -43,14 +77,15 @@ function onSettingsChange(config = {}) {
   };
 }
 
-onSettingsChange();
+function onStartGame() {
 
-function onStartGame(sound) {
-  gameController = new GameController(gameSettings, sound);
+  gameController = new GameController(gameSettings, Sound);
   document.body.classList.add('in-game');
 }
 
-function init(sound) {
+function init() {
+  Sound.play('menuBackground');
+
   React.render(
     <Splashscreen state={'visible'} />,
     document.querySelector('#splashscreen-container')
@@ -58,12 +93,9 @@ function init(sound) {
 
   React.render(
     <Menu 
-      sound={sound}
+      Sound={Sound}
       onStartGame={onStartGame}
       onSettingsChange={onSettingsChange} />,
     document.querySelector('#menu-container')
   );
 }
-
-const sound = new Sound(init);
-

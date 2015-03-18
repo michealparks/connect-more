@@ -1,9 +1,10 @@
-import util from 'util/core';
+import util      from 'util/core';
+import {publish} from 'util/mediator';
 
 export default class Player {
   constructor(config) {
     this.index = config.index;
-    this.name  = config.name || `Player ${this.index}`;
+    this.name  = config.name || `Player ${this.index+1}`;
     this.type  = config.type || 'AI';
     this.moves = [];
     this.longestChains = [];
@@ -30,8 +31,8 @@ export default class Player {
   endMove(grid) {
     this.longestChains = this.findLongestChains(grid, grid.nConnect);
 
-    if (this.longestChains.length == grid.nConnect) {
-      return alert(`${this.name} wins!`);
+    if (this.longestChains.filter(chain => chain.length == grid.nConnect)[0]) {
+      publish('Player::win', this);
     }
     return this;
   }

@@ -1,19 +1,4 @@
-Audio.prototype.fadeOut = function(done) {
-  let fade = () => {
-    if (this.volume - 0.01 <= 0) {
-      this.volume = 0;
-      return done();
-    }
-
-    if (this.volume >= 0) this.volume -= 0.05;
-
-    window.setTimeout(fade, 1000/16);
-  }
-
-  window.setTimeout(fade, 1000/16);
-}
-
-export default class Sound {
+class Sound {
   constructor(done) {
     this.menuBackground = new Audio('./build/Brandenburg Concerto No. 3 in G major, BWV1048 I ,  Allegro.mp3');
     this.gameBackground = new Audio('./build/Brandenburg Concerto No. 4 in G major, BWV1049 I , Allegro.mp3');
@@ -26,43 +11,70 @@ export default class Sound {
     this.menuBackground.volume = 0.4;
     this.gameBackground.volume = 0.4;
     this.loseBackground.volume = 0.4;
+    this.winBackground.volume  = 0.4;
 
     this.hitEffect.volume = 0.4;
+    this.clickEffect.volume = 0.4;
 
     this.playing  = null;
     this.disabled = false;
+  }
 
-    this.menuBackground.addEventListener('canplaythrough', () => {
-      this.menuBackground.play();
-      this.playing = this.menuBackground;
-      done(this);
-    });
+  disable() {
+    this.disabled = true;
+    if (this.playing) {
+      this.fadeOut(this.playing);
+    }
   }
 
   play(type) {
     if (this.disabled) return;
 
-    this.playing.fadeOut(() => {
+    if (this.playing) {
+      this.fadeOut(this.playing, () => {
+        this[type].currentTime = 0;
+        this[type].volume = 0.4;
+        this[type].play()
+        this.playing = this[type];
+      });
+    } else {
       this[type].play()
       this.playing = this[type];
-    });
+    }
+  }
+
+  fadeOut(sound, done) {
+    let fade = () => {
+      if (sound.volume - 0.01 <= 0) {
+        sound.volume = 0;
+        return done && done();
+      }
+
+      if (sound.volume >= 0) sound.volume -= 0.05;
+
+      window.setTimeout(fade, 1000/16);
+    }
+
+    window.setTimeout(fade, 1000/16);
   }
 
   playHitEffect() {
     window.setTimeout(() => {
-      this.hitEffect.volume = 0.2;
+      this.hitEffect.volume = 0.1;
       this.hitEffect.currentTime = 0;
       this.hitEffect.play();
     }, 500);
     window.setTimeout(() => {
-      this.hitEffect.volume = 0.1;
+      this.hitEffect.volume = 0.05;
       this.hitEffect.currentTime = 0;
       this.hitEffect.play();
     }, 900);
     window.setTimeout(() => {
-      this.hitEffect.volume = 0.05;
+      this.hitEffect.volume = 0.025;
       this.hitEffect.currentTime = 0;
       this.hitEffect.play();
     }, 1100);
   }
 }
+
+export default new Sound();

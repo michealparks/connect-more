@@ -14,7 +14,7 @@ export default React.createClass({
   },
 
   play() {
-    this.props.onStartGame(this.props.sound);
+    this.props.onStartGame();
   },
 
   settings() {

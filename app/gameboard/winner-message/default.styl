@@ -1,0 +1,47 @@
+@import 'nib'
+
+#winner-message
+  note()
+  box-sizing border-box
+  z-index 1
+  absolute top 50% left 50%
+  size 500px 200px
+  margin -100px -250px
+  padding 20px
+  
+  font-family 'Great Vibes', cursive
+  font-size 28px
+  
+  pointer-events none
+  opacity 0
+  backface-visibility hidden
+  transform rotateY(-720deg) scale(0.2)
+  transition transform 600ms $ease, opacity 500ms
+  
+  &.active
+    pointer-events auto
+    opacity 1
+    transform none
+  
+  // #message
+      
+  [id*='btn-']
+    note()
+    cursor pointer
+    absolute bottom -70px left
+    width 200px
+    padding 10px 20px
+    text-align center
+    
+  #btn-menu
+    left auto
+    right 0
+    
+  .champion
+    font-size 75px
+    margin 0 30px 0 36px
+    
+  .name
+    font-size 34px
+    margin 10px
+    
