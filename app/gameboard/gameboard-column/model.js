@@ -1,7 +1,5 @@
 import GameboardTile from 'gameboard/gameboard-column/gameboard-tile/model';
 
-import {publish}     from 'util/mediator';
-
 export default React.createClass({
   displayName: 'GameboardColumn', 
 
@@ -12,7 +10,8 @@ export default React.createClass({
   },
 
   onMouseOver() {
-    if (window.ontouchstart === undefined) {
+    if (window.ontouchstart !== undefined) return;
+
     const columnData = this.props.data;
     let i = columnData.length;
     while (i-- > 0) {
@@ -24,7 +23,7 @@ export default React.createClass({
   },
 
   onMouseLeave() {
-    if (window.ontouchstart === undefined) return;
+    if (window.ontouchstart !== undefined) return;
     
     this.setState({hovered: -1});
   },
@@ -33,7 +32,7 @@ export default React.createClass({
     if (window.ontouchstart !== undefined) return;
     if (this.props.data.indexOf(-1) == -1) return;
 
-    publish('Column::ptrup', parseInt(e.currentTarget.id, 10));
+    this.props.onPlayerMove(parseInt(e.currentTarget.id, 10))
   },
 
   render() {

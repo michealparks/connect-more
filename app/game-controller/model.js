@@ -37,6 +37,7 @@ class GameController {
   }
 
   onPlayerMove(column) {
+    console.log(this)
     if (! this.canMove || this.hasEnded) return;
 
     Sound.playHitEffect();
@@ -45,6 +46,7 @@ class GameController {
       .makeMove(this.grid, column)
       .endMove(this.grid);
 
+    console.log('here')
     this.update();
 
     window.setTimeout(() => {
@@ -86,7 +88,10 @@ class GameController {
 
   update() {
     React.render(
-      <Gameboard sound={Sound} grid={this.grid} tileSize={this.tileSize} />,
+      <Gameboard 
+        onPlayerMove={this.onPlayerMove.bind(this)}
+        grid={this.grid} 
+        tileSize={this.tileSize} />,
       document.querySelector('#gameboard-container')
     );
   }

@@ -27,8 +27,6 @@ export default React.createClass({
       target = target.parentNode;
       if (target == null) return;
     }
-
-    console.log(target)
   },
 
   onTouchEnd(e) {
@@ -41,12 +39,16 @@ export default React.createClass({
     const id = parseInt(target.id, 10);
 
     if (this.props.grid.data[id].indexOf(-1) == -1) return;
-    publish('Column::ptrup', parseInt(id, 10));
+
+    console.log(id)
+    this.props.onPlayerMove(parseInt(id, 10))
+    //publish('Column::ptrup', );
   },
 
   render() {
     const columns = this.props.grid.data.map((column, i) =>
       <GameboardColumn 
+        onPlayerMove={this.props.onPlayerMove}
         key={i}
         id={i}
         data={column}
@@ -64,7 +66,7 @@ export default React.createClass({
         <GameboardSurface 
           width={this.props.grid.columns}
           tileSize={this.props.tileSize} />
-        <WinnerMessage sound={this.props.sound} />
+        <WinnerMessage />
       </section>
     );
   }
