@@ -4,7 +4,7 @@
   note()
   box-sizing border-box
   z-index 1
-  absolute top 50% left 50%
+  fixed top 50% left 50%
   size 500px 200px
   margin -100px -250px
   padding 20px
@@ -22,6 +22,9 @@
     pointer-events auto
     opacity 1
     transform none
+    
+    @media (max-device-width: 667px) 
+      transform scale(0.67)
   
   // #message
       

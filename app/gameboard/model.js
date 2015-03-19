@@ -27,6 +27,8 @@ export default React.createClass({
       target = target.parentNode;
       if (target == null) return;
     }
+
+    console.log(target)
   },
 
   onTouchEnd(e) {

@@ -20350,209 +20350,6 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
       onSettingsChange: onSettingsChange }), document.querySelector("#menu-container"));
   }
 });
-define("game-controller/model", ["exports", "module", "util/global", "util/mediator", "player/model", "gameboard/model", "grid/model", "sound/model"], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel, _soundModel) {
-  "use strict";
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
-
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-  var GLOBAL = _interopRequire(_utilGlobal);
-
-  var subscribe = _utilMediator.subscribe;
-
-  var Player = _interopRequire(_playerModel);
-
-  var Gameboard = _interopRequire(_gameboardModel);
-
-  var Grid = _interopRequire(_gridModel);
-
-  var Sound = _interopRequire(_soundModel);
-
-  var GameController = (function () {
-    function GameController(config) {
-      var _this = this;
-
-      _classCallCheck(this, GameController);
-
-      subscribe("Column::ptrup", this.onPlayerMove.bind(this));
-      subscribe("Player:win", this.onPlayerWin.bind(this));
-
-      window.addEventListener("resize", function () {
-        _this.tileSize = window.innerWidth / _this.grid.columns;
-        if (_this.tileSize > 100) _this.tileSize = 100;
-        _this.update();
-      });
-    }
-
-    _prototypeProperties(GameController, null, {
-      newGame: {
-        value: function newGame(config) {
-          this.grid = new Grid(config.grid);
-          this.tileSize = window.innerWidth / this.grid.columns;
-          this.hasEnded = false;
-          this.players = config.players.map(function (config) {
-            return new Player(config);
-          });
-          this.player = this.players[0];
-
-          if (this.tileSize > 100) this.tileSize = 100;
-
-          Sound.play("gameBackground");
-          this.update();
-        },
-        writable: true,
-        configurable: true
-      },
-      onPlayerWin: {
-        value: function onPlayerWin() {
-          this.hasEnded = true;
-        },
-        writable: true,
-        configurable: true
-      },
-      onPlayerMove: {
-        value: function onPlayerMove(column) {
-          var _this = this;
-
-          Sound.playHitEffect();
-          this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
-
-          this.update();
-
-          window.setTimeout(function () {
-            if (_this.hasEnded) return;
-
-            _this.nextPlayer();
-
-            var computerMove = function () {
-              Sound.playHitEffect();
-              _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
-
-              _this.update();
-              _this.nextPlayer();
-
-              if (_this.player.type == "computer") {
-                window.setTimeout(computerMove, 1000);
-              }
-            };
-
-            console.log(_this.player.type);
-            if (_this.player.type == "computer") {
-              window.setTimeout(computerMove, 1000);
-            }
-          }, 300);
-        },
-        writable: true,
-        configurable: true
-      },
-      nextPlayer: {
-        value: function nextPlayer() {
-          this.player = this.player.index == this.players.length - 1 ? this.players[0] : this.players[this.player.index + 1];
-          return this.player;
-        },
-        writable: true,
-        configurable: true
-      },
-      update: {
-        value: function update() {
-          React.render(React.createElement(Gameboard, { sound: Sound, grid: this.grid, tileSize: this.tileSize }), document.querySelector("#gameboard-container"));
-        },
-        writable: true,
-        configurable: true
-      }
-    });
-
-    return GameController;
-  })();
-
-  module.exports = new GameController();
-});
-define("gameboard/model", ["exports", "module", "gameboard/winner-message/model", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
-  "use strict";
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-  var WinnerMessage = _interopRequire(_gameboardWinnerMessageModel);
-
-  var GameboardSurface = _interopRequire(_gameboardGameboardSurfaceModel);
-
-  var GameboardColumn = _interopRequire(_gameboardGameboardColumnModel);
-
-  var publish = _utilMediator.publish;
-  module.exports = React.createClass({
-    displayName: "Gameboard",
-
-    getInitialState: function getInitialState() {
-      var width = this.props.grid.columns * this.props.tileSize;
-      var height = this.props.grid.rows * this.props.tileSize;
-      return {
-        style: {
-          width: "" + width + "px",
-          height: "" + height + "px",
-          margin: "0 -" + width / 2 + "px",
-          left: "50%"
-        },
-        hovered: -1
-      };
-    },
-
-    onTouchMove: function onTouchMove(e) {
-      var target = e.target;
-      while (target.className !== "gameboard-column") {
-        target = target.parentNode;
-        if (target == null) {
-          return;
-        }
-      }
-    },
-
-    onTouchEnd: function onTouchEnd(e) {
-      var target = e.target;
-      while (target.className !== "gameboard-column") {
-        target = target.parentNode;
-        if (target == null) {
-          return;
-        }
-      }
-
-      var id = parseInt(target.id, 10);
-
-      if (this.props.grid.data[id].indexOf(-1) == -1) {
-        return;
-      }publish("Column::ptrup", parseInt(id, 10));
-    },
-
-    render: function render() {
-      var _this = this;
-
-      var columns = this.props.grid.data.map(function (column, i) {
-        return React.createElement(GameboardColumn, {
-          key: i,
-          id: i,
-          data: column,
-          height: column.length,
-          tileSize: _this.props.tileSize });
-      });
-
-      return React.createElement(
-        "section",
-        {
-          style: this.state.style,
-          id: "gameboard",
-          onTouchMove: this.onTouchMove,
-          onTouchEnd: this.onTouchEnd },
-        columns,
-        React.createElement(GameboardSurface, {
-          width: this.props.grid.columns,
-          tileSize: this.props.tileSize }),
-        React.createElement(WinnerMessage, { sound: this.props.sound })
-      );
-    }
-  });
-});
 define("grid/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
@@ -20760,61 +20557,130 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
   module.exports = Grid;
 });
-define("menu/model", ["exports", "module", "menu/settings/model"], function (exports, module, _menuSettingsModel) {
+define("game-controller/model", ["exports", "module", "util/global", "util/mediator", "player/model", "gameboard/model", "grid/model", "sound/model"], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel, _soundModel) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-  var Settings = _interopRequire(_menuSettingsModel);
+  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
-  module.exports = React.createClass({
-    displayName: "Menu",
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
-    getInitialState: function getInitialState() {
-      return {
-        menuState: "intro"
-      };
-    },
+  var GLOBAL = _interopRequire(_utilGlobal);
 
-    componentDidMount: function componentDidMount() {
-      setTimeout(function () {
-        return document.getElementById("title").classList.add("active");
-      }, 100);
-    },
+  var subscribe = _utilMediator.subscribe;
 
-    play: function play() {
-      this.props.onStartGame();
-    },
+  var Player = _interopRequire(_playerModel);
 
-    settings: function settings() {
-      this.setState({
-        menuState: this.state.menuState == "settings" ? "" : "settings"
+  var Gameboard = _interopRequire(_gameboardModel);
+
+  var Grid = _interopRequire(_gridModel);
+
+  var Sound = _interopRequire(_soundModel);
+
+  var GameController = (function () {
+    function GameController(config) {
+      var _this = this;
+
+      _classCallCheck(this, GameController);
+
+      subscribe("Column::ptrup", this.onPlayerMove.bind(this));
+      subscribe("Player:win", this.onPlayerWin.bind(this));
+
+      window.addEventListener("resize", function () {
+        _this.tileSize = window.innerWidth / _this.grid.columns;
+        if (_this.tileSize > 100) _this.tileSize = 100;
+        _this.update();
       });
-    },
-
-    render: function render() {
-      return React.createElement(
-        "div",
-        { id: "menu", className: this.state.menuState },
-        React.createElement(
-          "div",
-          { id: "title" },
-          "Connect More",
-          React.createElement(
-            "div",
-            { onClick: this.play, id: "btn-play" },
-            "I accept"
-          ),
-          React.createElement(
-            "div",
-            { onClick: this.settings, id: "btn-settings" },
-            "Arrangements"
-          )
-        ),
-        React.createElement(Settings, { onSubmit: this.settings, onSettingsChange: this.props.onSettingsChange })
-      );
     }
-  });
+
+    _prototypeProperties(GameController, null, {
+      newGame: {
+        value: function newGame(config) {
+          this.grid = new Grid(config.grid);
+          this.tileSize = window.innerWidth / this.grid.columns;
+          this.canMove = true;
+          this.hasEnded = false;
+          this.players = config.players.map(function (config) {
+            return new Player(config);
+          });
+          this.player = this.players[0];
+
+          if (this.tileSize > 100) this.tileSize = 100;
+
+          Sound.play("gameBackground");
+          this.update();
+        },
+        writable: true,
+        configurable: true
+      },
+      onPlayerWin: {
+        value: function onPlayerWin() {
+          this.hasEnded = true;
+        },
+        writable: true,
+        configurable: true
+      },
+      onPlayerMove: {
+        value: function onPlayerMove(column) {
+          var _this = this;
+
+          if (!this.canMove || this.hasEnded) {
+            return;
+          }Sound.playHitEffect();
+          this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
+
+          this.update();
+
+          window.setTimeout(function () {
+            if (_this.hasEnded) return;
+
+            _this.nextPlayer();
+
+            var computerMove = function () {
+              Sound.playHitEffect();
+              _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
+
+              _this.update();
+              _this.nextPlayer();
+
+              if (_this.player.type == "computer") {
+                window.setTimeout(computerMove, 1000);
+              } else {
+                _this.canMove = true;
+              }
+            };
+
+            if (_this.player.type == "computer") {
+              _this.canMove = false;
+              window.setTimeout(computerMove, 1000);
+            }
+          }, 300);
+        },
+        writable: true,
+        configurable: true
+      },
+      nextPlayer: {
+        value: function nextPlayer() {
+          this.player = this.player.index == this.players.length - 1 ? this.players[0] : this.players[this.player.index + 1];
+          return this.player;
+        },
+        writable: true,
+        configurable: true
+      },
+      update: {
+        value: function update() {
+          React.render(React.createElement(Gameboard, { sound: Sound, grid: this.grid, tileSize: this.tileSize }), document.querySelector("#gameboard-container"));
+        },
+        writable: true,
+        configurable: true
+      }
+    });
+
+    return GameController;
+  })();
+
+  module.exports = new GameController();
 });
 define("player/model", ["exports", "module", "util/core", "util/mediator"], function (exports, module, _utilCore, _utilMediator) {
   "use strict";
@@ -20994,6 +20860,91 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
   module.exports = Player;
 });
+define("gameboard/model", ["exports", "module", "gameboard/winner-message/model", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
+  "use strict";
+
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var WinnerMessage = _interopRequire(_gameboardWinnerMessageModel);
+
+  var GameboardSurface = _interopRequire(_gameboardGameboardSurfaceModel);
+
+  var GameboardColumn = _interopRequire(_gameboardGameboardColumnModel);
+
+  var publish = _utilMediator.publish;
+  module.exports = React.createClass({
+    displayName: "Gameboard",
+
+    getInitialState: function getInitialState() {
+      var width = this.props.grid.columns * this.props.tileSize;
+      var height = this.props.grid.rows * this.props.tileSize;
+      return {
+        style: {
+          width: "" + width + "px",
+          height: "" + height + "px",
+          margin: "0 -" + width / 2 + "px",
+          left: "50%"
+        },
+        hovered: -1
+      };
+    },
+
+    onTouchMove: function onTouchMove(e) {
+      var target = e.target;
+      while (target.className !== "gameboard-column") {
+        target = target.parentNode;
+        if (target == null) {
+          return;
+        }
+      }
+
+      console.log(target);
+    },
+
+    onTouchEnd: function onTouchEnd(e) {
+      var target = e.target;
+      while (target.className !== "gameboard-column") {
+        target = target.parentNode;
+        if (target == null) {
+          return;
+        }
+      }
+
+      var id = parseInt(target.id, 10);
+
+      if (this.props.grid.data[id].indexOf(-1) == -1) {
+        return;
+      }publish("Column::ptrup", parseInt(id, 10));
+    },
+
+    render: function render() {
+      var _this = this;
+
+      var columns = this.props.grid.data.map(function (column, i) {
+        return React.createElement(GameboardColumn, {
+          key: i,
+          id: i,
+          data: column,
+          height: column.length,
+          tileSize: _this.props.tileSize });
+      });
+
+      return React.createElement(
+        "section",
+        {
+          style: this.state.style,
+          id: "gameboard",
+          onTouchMove: this.onTouchMove,
+          onTouchEnd: this.onTouchEnd },
+        columns,
+        React.createElement(GameboardSurface, {
+          width: this.props.grid.columns,
+          tileSize: this.props.tileSize }),
+        React.createElement(WinnerMessage, { sound: this.props.sound })
+      );
+    }
+  });
+});
 define("sound/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
@@ -21125,7 +21076,7 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
     player: null,
 
     getInitialState: function getInitialState() {
-      var grid = new Grid({ rows: 10, nConnect: 99 });
+      var grid = new Grid({ rows: 16, nConnect: 99 });
       return {
         grid: grid,
         tileSize: window.innerWidth / grid.columns
@@ -21178,6 +21129,62 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
         "div",
         { id: "splashscreen", className: this.props.state },
         React.createElement(Gameboard, { grid: this.state.grid, tileSize: this.state.tileSize })
+      );
+    }
+  });
+});
+define("menu/model", ["exports", "module", "menu/settings/model"], function (exports, module, _menuSettingsModel) {
+  "use strict";
+
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var Settings = _interopRequire(_menuSettingsModel);
+
+  module.exports = React.createClass({
+    displayName: "Menu",
+
+    getInitialState: function getInitialState() {
+      return {
+        menuState: "intro"
+      };
+    },
+
+    componentDidMount: function componentDidMount() {
+      setTimeout(function () {
+        return document.getElementById("title").classList.add("active");
+      }, 100);
+    },
+
+    play: function play() {
+      this.props.onStartGame();
+    },
+
+    settings: function settings() {
+      this.setState({
+        menuState: this.state.menuState == "settings" ? "" : "settings"
+      });
+    },
+
+    render: function render() {
+      return React.createElement(
+        "div",
+        { id: "menu", className: this.state.menuState },
+        React.createElement(
+          "div",
+          { id: "title" },
+          "Connect More",
+          React.createElement(
+            "div",
+            { onClick: this.play, id: "btn-play" },
+            "I accept"
+          ),
+          React.createElement(
+            "div",
+            { onClick: this.settings, id: "btn-settings" },
+            "Arrangements"
+          )
+        ),
+        React.createElement(Settings, { onSubmit: this.settings, onSettingsChange: this.props.onSettingsChange })
       );
     }
   });
@@ -21334,89 +21341,6 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     value: true
   });
 });
-define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/gameboard-column/gameboard-tile/model", "util/mediator"], function (exports, module, _gameboardGameboardColumnGameboardTileModel, _utilMediator) {
-  "use strict";
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-  var GameboardTile = _interopRequire(_gameboardGameboardColumnGameboardTileModel);
-
-  var publish = _utilMediator.publish;
-  module.exports = React.createClass({
-    displayName: "GameboardColumn",
-
-    getInitialState: function getInitialState() {
-      return {
-        hovered: this.props.hovered || -1
-      };
-    },
-
-    onMouseOver: function onMouseOver() {
-      var columnData = this.props.data;
-      var i = columnData.length;
-      while (i-- > 0) {
-        if (columnData[i] == -1) {
-          return this.setState({ hovered: i });
-        }
-      }
-      this.setState({ hovered: -1 });
-    },
-
-    onMouseLeave: function onMouseLeave() {
-      this.setState({ hovered: -1 });
-    },
-
-    onMouseUp: function onMouseUp(e) {
-      if (window.ontouchstart === undefined) {
-        if (this.props.data.indexOf(-1) == -1) {
-          return;
-        }publish("Column::ptrup", parseInt(e.currentTarget.id, 10));
-      }
-    },
-
-    render: function render() {
-      var _this = this;
-
-      var tiles = this.props.data.map(function (tile, i) {
-        return React.createElement(GameboardTile, {
-          key: i,
-          className: _this.state.hovered == i ? "hovered" : "",
-          tileSize: _this.props.tileSize,
-          playerClass: tile > -1 ? "p-" + tile : "" });
-      });
-
-      return React.createElement(
-        "div",
-        {
-          onMouseOver: this.onMouseOver,
-          onTouchStart: this.onMouseOver,
-          onMouseLeave: this.onMouseLeave,
-          onMouseUp: this.onMouseUp,
-          id: this.props.id,
-          style: {
-            height: "" + this.props.tileSize * this.props.height + "px",
-            width: "" + this.props.tileSize + "px"
-          },
-          className: "gameboard-column" },
-        tiles
-      );
-    }
-  });
-});
-define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
-  "use strict";
-
-  module.exports = React.createClass({
-    displayName: "GameboardSurface",
-
-    render: function render() {
-      return React.createElement("div", {
-        id: "gameboard-surface",
-        className: this.props.state,
-        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
-    }
-  });
-});
 define("gameboard/winner-message/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
   "use strict";
 
@@ -21490,199 +21414,6 @@ define("gameboard/winner-message/model", ["exports", "module", "util/mediator"],
           { onClick: this.goToMenu, id: "btn-menu" },
           "Return to menu"
         )
-      );
-    }
-  });
-});
-define("menu/settings/model", ["exports", "module"], function (exports, module) {
-  "use strict";
-
-  module.exports = React.createClass({
-    displayName: "Settings",
-
-    getInitialState: function getInitialState() {
-      var ls = window.localStorage;
-      var nC = ls.getItem("connectMore_numConnect") || 4;
-      var nH = ls.getItem("connectMore_numHumans") || 1;
-      var nAI = ls.getItem("connectMore_numComputers") || 1;
-      var nP = ls.getItem("connectMore_numPlayers") || 2;
-
-      return {
-        numConnect: nC - 0,
-        numHumans: nH - 0,
-        numComputers: nAI - 0,
-        numPlayers: nP - 0
-      };
-    },
-
-    componentDidUpdate: function componentDidUpdate() {
-      var ls = window.localStorage;
-      ls.setItem("connectMore_numConnect", this.state.numConnect);
-      ls.setItem("connectMore_numHumans", this.state.numHumans);
-      ls.setItem("connectMore_numComputers", this.state.numComputers);
-      ls.setItem("connectMore_numPlayers", this.state.numPlayers);
-    },
-
-    changeConnect: function changeConnect(e) {
-      this.setState({
-        numConnect: e.target.textContent - 0
-      });
-    },
-
-    changePlayerNum: function changePlayerNum(e) {
-      var num = e.target.textContent - 0;
-      var comps = this.state.numComputers;
-      var humans = this.state.numHumans;
-
-      switch (e.target.classList[1]) {
-        case "num-human-players":
-          this.setState({
-            numHumans: num,
-            numComputers: comps + num > 4 ? 4 - num : num < 2 && comps < 1 ? 1 : comps
-          });
-          break;
-        case "num-computer-players":
-          this.setState({
-            numHumans: humans + num > 4 ? 4 - num : humans,
-            numComputers: num
-          });
-          break;
-        default:
-          break;
-      }
-    },
-
-    onSubmit: function onSubmit() {
-      this.props.onSettingsChange(this.state);
-      this.props.onSubmit();
-    },
-
-    render: function render() {
-      return React.createElement(
-        "div",
-        { id: "settings" },
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "div",
-            { id: "num-connect", className: "container", "data-num": this.state.numConnect },
-            React.createElement(
-              "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
-              "3"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
-              "4"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
-              "5"
-            ),
-            React.createElement(
-              "span",
-              { className: "title" },
-              "to Connect"
-            )
-          ),
-          React.createElement(
-            "div",
-            { id: "num-human-players", className: "container", "data-num": this.state.numHumans },
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
-              "1"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
-              "2"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
-              "3"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
-              "4"
-            ),
-            React.createElement(
-              "span",
-              { className: "title" },
-              "Human Players"
-            )
-          ),
-          React.createElement(
-            "div",
-            { id: "num-computer-players", className: "container", "data-num": this.state.numComputers },
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
-              "0"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
-              "1"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
-              "2"
-            ),
-            React.createElement(
-              "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
-              "3"
-            ),
-            React.createElement(
-              "span",
-              { className: "title" },
-              "Computer Players"
-            )
-          )
-        ),
-        React.createElement(
-          "div",
-          { id: "btn-ammend", onClick: this.onSubmit },
-          "Ammend registry"
-        )
-      );
-    }
-  });
-});
-define("gameboard/gameboard-column/gameboard-tile/model", ["exports", "module"], function (exports, module) {
-  "use strict";
-
-  module.exports = React.createClass({
-    displayName: "GameboardTile",
-
-    render: function render() {
-      return React.createElement(
-        "div",
-        {
-          style: {
-            width: "" + this.props.tileSize + "px",
-            height: "" + this.props.tileSize + "px"
-          },
-          className: "" + this.props.playerClass + " gameboard-tile" },
-        React.createElement("div", {
-          style: {
-            width: "" + (this.props.tileSize - 10) + "px",
-            height: "" + (this.props.tileSize - 10) + "px"
-          },
-          className: "" + this.props.className + " shadow" }),
-        React.createElement("div", {
-          style: {
-            width: "" + (this.props.tileSize - 14) + "px",
-            height: "" + (this.props.tileSize - 14) + "px"
-          },
-          className: "piece " + this.props.playerClass })
       );
     }
   });

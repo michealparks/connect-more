@@ -12,7 +12,7 @@ export default React.createClass({
   player: null,
 
   getInitialState() {
-    const grid = new Grid({rows: 10, nConnect: 99});
+    const grid = new Grid({rows: 16, nConnect: 99});
     return {
       grid,
       tileSize: window.innerWidth/grid.columns

@@ -12,6 +12,7 @@ export default React.createClass({
   },
 
   onMouseOver() {
+    if (window.ontouchstart === undefined) {
     const columnData = this.props.data;
     let i = columnData.length;
     while (i-- > 0) {
@@ -23,14 +24,16 @@ export default React.createClass({
   },
 
   onMouseLeave() {
+    if (window.ontouchstart === undefined) return;
+    
     this.setState({hovered: -1});
   },
 
   onMouseUp(e) {
-    if (window.ontouchstart === undefined) {
-      if (this.props.data.indexOf(-1) == -1) return;
-      publish('Column::ptrup', parseInt(e.currentTarget.id, 10));
-    }
+    if (window.ontouchstart !== undefined) return;
+    if (this.props.data.indexOf(-1) == -1) return;
+
+    publish('Column::ptrup', parseInt(e.currentTarget.id, 10));
   },
 
   render() {
@@ -44,6 +47,7 @@ export default React.createClass({
 
     return (
       <div 
+        onTouchMove={this.onMouseOver}
         onMouseOver={this.onMouseOver}
         onTouchStart={this.onMouseOver}
         onMouseLeave={this.onMouseLeave}

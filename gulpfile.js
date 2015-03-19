@@ -26,6 +26,7 @@ gulp.task('javascript', function () {
         this.emit('end');
       })
     .pipe(addsrc.prepend('lib/almond.js'))
+    .pipe(addsrc.prepend('lib/react/tappable.js'))
     .pipe(addsrc.prepend('lib/react-with-addons.js'))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('build'));

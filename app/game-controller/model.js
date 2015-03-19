@@ -21,6 +21,7 @@ class GameController {
   newGame(config) {
     this.grid = new Grid(config.grid);
     this.tileSize = window.innerWidth/this.grid.columns;
+    this.canMove = true;
     this.hasEnded = false;
     this.players = config.players.map((config) => new Player(config));
     this.player = this.players[0];
@@ -36,6 +37,8 @@ class GameController {
   }
 
   onPlayerMove(column) {
+    if (! this.canMove || this.hasEnded) return;
+
     Sound.playHitEffect();
     this.player
       .beginMove()
@@ -61,11 +64,13 @@ class GameController {
 
         if (this.player.type == 'computer') {
           window.setTimeout(computerMove, 1000);
+        } else {
+          this.canMove = true;
         }
       }
 
-      console.log(this.player.type)
       if (this.player.type == 'computer') {
+        this.canMove = false;
         window.setTimeout(computerMove, 1000);
       }
     }, 300);
