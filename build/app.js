@@ -20986,15 +20986,18 @@ define("sound/model", ["exports", "module"], function (exports, module) {
       this.clickEffect.volume = 0.4;
 
       this.playing = null;
-      this.disabled = false;
+      this.enabled = Boolean(localStorage.getItem("connectMore_soundState") - 0);
     }
 
     _createClass(Sound, {
       disable: {
-        value: function disable() {
-          this.disabled = true;
-          if (this.playing) {
+        value: function disable(bool) {
+          this.enabled = bool;
+          if (this.playing && !this.enabled) {
             this.fadeOut(this.playing);
+          } else {
+            console.log("here");
+            this.menuBackground.play();
           }
         }
       },
@@ -21002,12 +21005,10 @@ define("sound/model", ["exports", "module"], function (exports, module) {
         value: function play(type) {
           var _this = this;
 
-          if (this.disabled) {
+          if (!this.enabled) {
             return;
           }if (this.playing) {
             this.fadeOut(this.playing, function () {
-              _this[type].currentTime = 0;
-              _this[type].volume = 0.4;
               _this[type].play();
               _this.playing = _this[type];
             });
@@ -21021,7 +21022,9 @@ define("sound/model", ["exports", "module"], function (exports, module) {
         value: function fadeOut(sound, done) {
           var fade = function () {
             if (sound.volume - 0.01 <= 0) {
-              sound.volume = 0;
+              sound.pause();
+              sound.currentTime = 0;
+              sound.volume = 0.4;
               return done && done();
             }
 
@@ -21288,20 +21291,6 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     if (!result) throw new Error("No listener was unsubscribed.");
   }
 });
-define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
-  "use strict";
-
-  module.exports = React.createClass({
-    displayName: "GameboardSurface",
-
-    render: function render() {
-      return React.createElement("div", {
-        id: "gameboard-surface",
-        className: this.props.state,
-        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
-    }
-  });
-});
 define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _gameboardGameboardColumnGameboardTileModel) {
   "use strict";
 
@@ -21375,6 +21364,20 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
     }
   });
 });
+define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
+  "use strict";
+
+  module.exports = React.createClass({
+    displayName: "GameboardSurface",
+
+    render: function render() {
+      return React.createElement("div", {
+        id: "gameboard-surface",
+        className: this.props.state,
+        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
+    }
+  });
+});
 define("gameboard/winner-message/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
   "use strict";
 
@@ -21432,8 +21435,12 @@ define("gameboard/winner-message/model", ["exports", "module", "util/mediator"],
     }
   });
 });
-define("menu/settings/model", ["exports", "module"], function (exports, module) {
+define("menu/settings/model", ["exports", "module", "sound/model"], function (exports, module, _soundModel) {
   "use strict";
+
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var Sound = _interopRequire(_soundModel);
 
   module.exports = React.createClass({
     displayName: "Settings",
@@ -21444,13 +21451,14 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
       var nH = ls.getItem("connectMore_numHumans") || 1;
       var nAI = ls.getItem("connectMore_numComputers") || 1;
       var nP = ls.getItem("connectMore_numPlayers") || 2;
+      var ss = ls.getItem("connectMore_soundState") || 1;
 
       return {
         numConnect: nC - 0,
         numHumans: nH - 0,
         numComputers: nAI - 0,
-        numPlayers: nP - 0
-      };
+        numPlayers: nP - 0,
+        sound: Boolean(ss - 0) };
     },
 
     componentDidUpdate: function componentDidUpdate() {
@@ -21459,6 +21467,9 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
       ls.setItem("connectMore_numHumans", this.state.numHumans);
       ls.setItem("connectMore_numComputers", this.state.numComputers);
       ls.setItem("connectMore_numPlayers", this.state.numPlayers);
+
+      // Bool to number to string, oh my!
+      ls.setItem("connectMore_soundState", "" + (this.state.sound - 0));
     },
 
     changeConnect: function changeConnect(e) {
@@ -21488,6 +21499,13 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
         default:
           break;
       }
+    },
+
+    toggleSound: function toggleSound() {
+      var newState = !this.state.sound;
+      console.log(newState);
+      this.setState({ sound: newState });
+      Sound.disable(newState);
     },
 
     onSubmit: function onSubmit() {
@@ -21589,6 +21607,20 @@ define("menu/settings/model", ["exports", "module"], function (exports, module) 
           "div",
           { id: "btn-ammend", onClick: this.onSubmit },
           "Ammend registry"
+        ),
+        React.createElement(
+          "div",
+          { id: "btn-sound-state", className: this.state.sound ? "on" : "off" },
+          React.createElement(
+            "div",
+            { onClick: this.toggleSound, className: "sound-option" },
+            "Sound on"
+          ),
+          React.createElement(
+            "div",
+            { onClick: this.toggleSound, className: "sound-option" },
+            "Sound off"
+          )
         )
       );
     }

@@ -16,24 +16,25 @@ class Sound {
     this.hitEffect.volume = 0.4;
     this.clickEffect.volume = 0.4;
 
-    this.playing  = null;
-    this.disabled = false;
+    this.playing = null;
+    this.enabled = Boolean(localStorage.getItem('connectMore_soundState') - 0)
   }
 
-  disable() {
-    this.disabled = true;
-    if (this.playing) {
+  disable(bool) {
+    this.enabled = bool;
+    if (this.playing && ! this.enabled) {
       this.fadeOut(this.playing);
+    } else {
+      console.log('here')
+      this.menuBackground.play();
     }
   }
 
   play(type) {
-    if (this.disabled) return;
+    if (! this.enabled) return;
 
     if (this.playing) {
       this.fadeOut(this.playing, () => {
-        this[type].currentTime = 0;
-        this[type].volume = 0.4;
         this[type].play()
         this.playing = this[type];
       });
@@ -46,7 +47,9 @@ class Sound {
   fadeOut(sound, done) {
     let fade = () => {
       if (sound.volume - 0.01 <= 0) {
-        sound.volume = 0;
+        sound.pause();
+        sound.currentTime = 0;
+        sound.volume = 0.4;
         return done && done();
       }
 

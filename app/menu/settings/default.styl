@@ -31,3 +31,25 @@
   #btn-ammend
     font-family 'Great Vibes', cursive
     transform none
+    
+  #btn-sound-state
+    fixed bottom -250px right 100px
+    font-size 30px
+    width 100px
+    
+    &.on .sound-option:first-child
+      opacity 1
+      
+    &.off .sound-option:last-child
+      opacity 1
+      
+    .sound-option
+      note()
+      position absolute
+      width 200px
+      padding 8px 0
+      opacity 0
+      transition 400ms
+    
+    
+      

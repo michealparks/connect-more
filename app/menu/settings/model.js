@@ -1,3 +1,5 @@
+import Sound from 'sound/model';
+
 export default React.createClass({
   displayName: 'Settings',
 
@@ -7,12 +9,14 @@ export default React.createClass({
     const nH  = ls.getItem('connectMore_numHumans')    || 1;
     const nAI = ls.getItem('connectMore_numComputers') || 1;
     const nP  = ls.getItem('connectMore_numPlayers')   || 2;
+    const ss  = ls.getItem('connectMore_soundState')   || 1;
 
     return {
       numConnect: nC - 0,
       numHumans: nH - 0,
       numComputers: nAI - 0,
-      numPlayers: nP - 0
+      numPlayers: nP - 0,
+      sound: Boolean(ss - 0),
     };
   },
 
@@ -22,6 +26,9 @@ export default React.createClass({
     ls.setItem('connectMore_numHumans', this.state.numHumans);
     ls.setItem('connectMore_numComputers', this.state.numComputers);
     ls.setItem('connectMore_numPlayers', this.state.numPlayers);
+
+    // Bool to number to string, oh my!
+    ls.setItem('connectMore_soundState', '' + (this.state.sound - 0));
   },
 
   changeConnect(e) {
@@ -51,6 +58,13 @@ export default React.createClass({
         break;
       default: break;
     }
+  },
+
+  toggleSound() {
+    const newState = ! this.state.sound;
+    console.log(newState)
+    this.setState({sound: newState})
+    Sound.disable(newState);
   },
 
   onSubmit() {
@@ -84,6 +98,10 @@ export default React.createClass({
           </div>
         </div>
         <div id='btn-ammend' onClick={this.onSubmit}>Ammend registry</div>
+        <div id='btn-sound-state' className={this.state.sound? 'on': 'off'}>
+          <div onClick={this.toggleSound} className='sound-option'>Sound on</div>
+          <div onClick={this.toggleSound} className='sound-option'>Sound off</div>
+        </div>
       </div>
     );
   }
