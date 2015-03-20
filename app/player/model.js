@@ -32,9 +32,9 @@ export default class Player {
     this.longestChains = this.findLongestChains(grid, grid.nConnect);
 
     if (this.longestChains.filter(chain => chain.length == grid.nConnect)[0]) {
-      publish('Player::win', this);
+      return this;
     }
-    return this;
+    return false;
   }
 
   findLongestChains(grid, max) {

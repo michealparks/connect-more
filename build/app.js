@@ -20272,14 +20272,6 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
 
   init();
 
-  subscribe("Player::win", function (player) {
-    if (player.type == "computer") {
-      Sound.play("loseBackground");
-    } else {
-      Sound.play("winBackground");
-    }
-  });
-
   subscribe("Game::restart", onStartGame);
 
   subscribe("Game::end", function () {
@@ -20355,7 +20347,7 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -20377,9 +20369,6 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
       _classCallCheck(this, GameController);
 
-      subscribe("Column::ptrup", this.onPlayerMove.bind(this));
-      subscribe("Player:win", this.onPlayerWin.bind(this));
-
       window.addEventListener("resize", function () {
         _this.tileSize = window.innerWidth / _this.grid.columns;
         if (_this.tileSize > 100) _this.tileSize = 100;
@@ -20387,13 +20376,14 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
       });
     }
 
-    _prototypeProperties(GameController, null, {
+    _createClass(GameController, {
       newGame: {
         value: function newGame(config) {
           this.grid = new Grid(config.grid);
           this.tileSize = window.innerWidth / this.grid.columns;
           this.canMove = true;
           this.hasEnded = false;
+          this.winningPlayer = false;
           this.players = config.players.map(function (config) {
             return new Player(config);
           });
@@ -20403,75 +20393,65 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
           Sound.play("gameBackground");
           this.update();
-        },
-        writable: true,
-        configurable: true
+        }
       },
-      onPlayerWin: {
-        value: function onPlayerWin() {
+      onWin: {
+        value: function onWin() {
           this.hasEnded = true;
-        },
-        writable: true,
-        configurable: true
+          if (this.winningPlayer.type == "computer") {
+            Sound.play("loseBackground");
+          } else {
+            Sound.play("winBackground");
+          }
+        }
       },
       onPlayerMove: {
         value: function onPlayerMove(column) {
-          var _this = this;
-
-          console.log(this);
           if (!this.canMove || this.hasEnded) {
             return;
           }Sound.playHitEffect();
-          this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
-
-          console.log("here");
+          this.winningPlayer = this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
           this.update();
 
-          window.setTimeout(function () {
-            if (_this.hasEnded) return;
+          if (this.winningPlayer) {
+            return this.onWin();
+          }this.nextPlayer();
+          if (this.player.type == "computer") {
+            this.canMove = false;
+            window.setTimeout(this.computerMove, 1000);
+          }
+        }
+      },
+      onComputerMove: {
+        value: function onComputerMove() {
+          Sound.playHitEffect();
+          this.winningPlayer = this.player.beginMove().decideMove(this.grid, this.players).endMove(this.grid);
+          this.update();
 
-            _this.nextPlayer();
-
-            var computerMove = function () {
-              Sound.playHitEffect();
-              _this.player.beginMove().decideMove(_this.grid, _this.players).endMove(_this.grid);
-
-              _this.update();
-              _this.nextPlayer();
-
-              if (_this.player.type == "computer") {
-                window.setTimeout(computerMove, 1000);
-              } else {
-                _this.canMove = true;
-              }
-            };
-
-            if (_this.player.type == "computer") {
-              _this.canMove = false;
-              window.setTimeout(computerMove, 1000);
-            }
-          }, 300);
-        },
-        writable: true,
-        configurable: true
+          if (this.winningPlayer) {
+            return this.onWin();
+          }this.nextPlayer();
+          if (this.player.type == "computer") {
+            window.setTimeout(this.computerMove, 1000);
+          } else {
+            this.canMove = true;
+          }
+        }
       },
       nextPlayer: {
         value: function nextPlayer() {
           this.player = this.player.index == this.players.length - 1 ? this.players[0] : this.players[this.player.index + 1];
           return this.player;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       update: {
         value: function update() {
           React.render(React.createElement(Gameboard, {
+            winningPlayer: this.winningPlayer,
             onPlayerMove: this.onPlayerMove.bind(this),
             grid: this.grid,
             tileSize: this.tileSize }), document.querySelector("#gameboard-container"));
-        },
-        writable: true,
-        configurable: true
+        }
       }
     });
 
@@ -20532,8 +20512,7 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
 
       if (this.props.grid.data[id].indexOf(-1) == -1) {
         return;
-      }console.log(id);
-      this.props.onPlayerMove(parseInt(id, 10));
+      }this.props.onPlayerMove(parseInt(id, 10));
     },
 
     render: function render() {
@@ -20560,16 +20539,15 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
         React.createElement(GameboardSurface, {
           width: this.props.grid.columns,
           tileSize: this.props.tileSize }),
-        React.createElement(WinnerMessage, null)
+        React.createElement(WinnerMessage, { winningPlayer: this.props.winningPlayer })
       );
     }
   });
 });
-//publish('Column::ptrup', );
 define("grid/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -20592,12 +20570,11 @@ define("grid/model", ["exports", "module"], function (exports, module) {
       }
     }
 
-    _prototypeProperties(Grid, null, {
+    _createClass(Grid, {
       data: {
         get: function () {
           return this._data;
-        },
-        configurable: true
+        }
       },
       insertPiece: {
         value: function insertPiece(column, player) {
@@ -20609,21 +20586,15 @@ define("grid/model", ["exports", "module"], function (exports, module) {
             }
           }
           return { x: column, y: r };
-        },
-        writable: true,
-        configurable: true
+        }
       },
       removePiece: {
-        value: function removePiece(column, row) {},
-        writable: true,
-        configurable: true
+        value: function removePiece(column, row) {}
       },
       pieceIsInsertable: {
         value: function pieceIsInsertable(column, row) {
           return this._data[column] && this._data[column][row] && this._data[column][row] === -1;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       isFilled: {
         value: function isFilled() {
@@ -20636,9 +20607,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
           }
 
           return true;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       canContinueChainInDirection: {
         value: function canContinueChainInDirection(column, row) {
@@ -20653,9 +20622,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
             return this.pieceIsInsertable(column + dir, row) || this.pieceIsInsertable(column + dir, row - 1);
           }
-        },
-        writable: true,
-        configurable: true
+        }
       },
       canCompleteChain: {
         value: function canCompleteChain(column, row, dir, needed) {
@@ -20669,9 +20636,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
           }
 
           return needed == 0;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       findChainContinuingColumn: {
         value: function findChainContinuingColumn(chain) {
@@ -20695,9 +20660,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
           }
 
           return { x: -1, y: -1 };
-        },
-        writable: true,
-        configurable: true
+        }
       },
       makeChainFromPoint: {
 
@@ -20718,7 +20681,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
           // Vertical test going down
           for (var i = y + 1; i < h; i++) {
-            if (grid[x][i] == p) m.push({ x: x, y: i });
+            if (grid[x][i] == p) m.push({ x: x, y: i });else break;
           }
 
           if (m.length >= c) {
@@ -20727,10 +20690,10 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
           // Horizontal test moving left and right.
           for (var i = x - 1; i > -1; i--) {
-            if (grid[i] && grid[i][y] == p) m.unshift({ x: i, y: y });
+            if (grid[i] && grid[i][y] == p) m.unshift({ x: i, y: y });else break;
           }
           for (var i = x + 1; i < w; i++) {
-            if (grid[i] && grid[i][y] == p) m.push({ x: i, y: y });
+            if (grid[i] && grid[i][y] == p) m.push({ x: i, y: y });else break;
           }
 
           if (m.length >= c) {
@@ -20739,10 +20702,10 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
           // Diagonal test moving up-left and down-right
           for (var i = x - 1, j = y - 1; i > -1 && j > -1; i--, j--) {
-            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });
+            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
           }
           for (var i = x + 1, j = y + 1; i < w && j < h; i++, j++) {
-            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });
+            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
           }
 
           if (m.length >= c) {
@@ -20751,10 +20714,10 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
           // Diagonal test moving down-right and up-left
           for (var i = x + 1, j = y - 1; i < w && j > -1; i++, j--) {
-            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });
+            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
           }
           for (var i = x - 1, j = y + 1; i > -1 && j < h; i--, j++) {
-            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });
+            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
           }
 
           if (m.length >= c) {
@@ -20762,9 +20725,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
           } else m = [{ x: x, y: y }];
 
           return m;
-        },
-        writable: true,
-        configurable: true
+        }
       }
     });
 
@@ -20834,7 +20795,7 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -20859,21 +20820,17 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
       this.errorFactor = this.difficulty == "impossible" ? 0 : this.errorFactor;
     }
 
-    _prototypeProperties(Player, null, {
+    _createClass(Player, {
       beginMove: {
         value: function beginMove() {
           return this;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       makeMove: {
         value: function makeMove(grid, column) {
           this.moves.push(grid.insertPiece(column, this.index));
           return this;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       endMove: {
         value: function endMove(grid) {
@@ -20882,12 +20839,10 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
           if (this.longestChains.filter(function (chain) {
             return chain.length == grid.nConnect;
           })[0]) {
-            publish("Player::win", this);
+            return this;
           }
-          return this;
-        },
-        writable: true,
-        configurable: true
+          return false;
+        }
       },
       findLongestChains: {
         value: function findLongestChains(grid, max) {
@@ -20913,9 +20868,7 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
             }
           }
           return longestChains;
-        },
-        writable: true,
-        configurable: true
+        }
       },
       decideMove: {
 
@@ -20996,9 +20949,7 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
           // (6)
           return this.makeMove(grid, util.randomInt(0, grid.columns - 1));
-        },
-        writable: true,
-        configurable: true
+        }
       }
     });
 
@@ -21010,7 +20961,7 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 define("sound/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -21038,16 +20989,14 @@ define("sound/model", ["exports", "module"], function (exports, module) {
       this.disabled = false;
     }
 
-    _prototypeProperties(Sound, null, {
+    _createClass(Sound, {
       disable: {
         value: function disable() {
           this.disabled = true;
           if (this.playing) {
             this.fadeOut(this.playing);
           }
-        },
-        writable: true,
-        configurable: true
+        }
       },
       play: {
         value: function play(type) {
@@ -21066,9 +21015,7 @@ define("sound/model", ["exports", "module"], function (exports, module) {
             this[type].play();
             this.playing = this[type];
           }
-        },
-        writable: true,
-        configurable: true
+        }
       },
       fadeOut: {
         value: function fadeOut(sound, done) {
@@ -21084,9 +21031,7 @@ define("sound/model", ["exports", "module"], function (exports, module) {
           };
 
           window.setTimeout(fade, 1000 / 16);
-        },
-        writable: true,
-        configurable: true
+        }
       },
       playHitEffect: {
         value: function playHitEffect() {
@@ -21107,9 +21052,7 @@ define("sound/model", ["exports", "module"], function (exports, module) {
             _this.hitEffect.currentTime = 0;
             _this.hitEffect.play();
           }, 1100);
-        },
-        writable: true,
-        configurable: true
+        }
       }
     });
 
@@ -21176,7 +21119,7 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
       this.setState({ grid: this.state.grid });
       this.nextPlayer();
 
-      if (this.state.grid.isFilled()) {
+      if (this.state.grid.isFilled() || document.body.classList.contains("in-game")) {
         return;
       }this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
     },
@@ -21221,20 +21164,25 @@ define("util/core", ["exports", "module"], function (exports, module) {
 define("util/device", ["exports"], function (exports) {
   "use strict";
 
-  var hasTouch = exports.hasTouch = window.ontouchstart !== undefined;
-  var ptrEnabled = exports.ptrEnabled = navigator.pointerEnabled || navigator.msPointerEnabled;
-
-  var ptrdown = exports.ptrdown = ptrEnabled ? "pointerdown" : hasTouch ? "touchstart" : "mousedown";
-  var ptrmove = exports.ptrmove = ptrEnabled ? "pointermove" : hasTouch ? "touchmove" : "mousemove";
-  var ptrup = exports.ptrup = ptrEnabled ? "pointerup" : hasTouch ? "touchend" : "mouseup";
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+  var hasTouch = window.ontouchstart !== undefined;
+  exports.hasTouch = hasTouch;
+  var ptrEnabled = navigator.pointerEnabled || navigator.msPointerEnabled;
+
+  exports.ptrEnabled = ptrEnabled;
+  var ptrdown = ptrEnabled ? "pointerdown" : hasTouch ? "touchstart" : "mousedown";
+  exports.ptrdown = ptrdown;
+  var ptrmove = ptrEnabled ? "pointermove" : hasTouch ? "touchmove" : "mousemove";
+  exports.ptrmove = ptrmove;
+  var ptrup = ptrEnabled ? "pointerup" : hasTouch ? "touchend" : "mouseup";
+  exports.ptrup = ptrup;
 });
 define("util/global", ["exports", "module"], function (exports, module) {
   "use strict";
 
-  var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -21248,7 +21196,7 @@ define("util/global", ["exports", "module"], function (exports, module) {
       this._player = 0;
     }
 
-    _prototypeProperties(GLOBAL, null, {
+    _createClass(GLOBAL, {
       grid: {
         get: function () {
           return this._grid;
@@ -21257,8 +21205,7 @@ define("util/global", ["exports", "module"], function (exports, module) {
           this._grid.columns = optns.columns || this._grid.columns;
           this._grid.height = optns.height || this._grid.height;
           this._grid.tileSize = optns.tileSize || this._grid.tileSize;
-        },
-        configurable: true
+        }
       },
       nConnect: {
         get: function () {
@@ -21266,27 +21213,22 @@ define("util/global", ["exports", "module"], function (exports, module) {
         },
         set: function (n) {
           this._nConnect = n;
-        },
-        configurable: true
+        }
       },
       nPlayers: {
         get: function (n) {
           this._nPlayers = n;
-        },
-        configurable: true
+        }
       },
       player: {
         get: function () {
           return this._player;
-        },
-        configurable: true
+        }
       },
       nextPlayer: {
         value: function nextPlayer() {
           this._player = this._player == this._nPlayers - 1 ? 0 : this._player + 1;
-        },
-        writable: true,
-        configurable: true
+        }
       }
     });
 
@@ -21303,6 +21245,9 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
   exports.publish = publish;
   exports.subscribe = subscribe;
   exports.unsubscribe = unsubscribe;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 
   var util = _interopRequire(_utilCore);
 
@@ -21342,9 +21287,19 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
 
     if (!result) throw new Error("No listener was unsubscribed.");
   }
+});
+define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
+  "use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
+  module.exports = React.createClass({
+    displayName: "GameboardSurface",
+
+    render: function render() {
+      return React.createElement("div", {
+        id: "gameboard-surface",
+        className: this.props.state,
+        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
+    }
   });
 });
 define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _gameboardGameboardColumnGameboardTileModel) {
@@ -21420,20 +21375,6 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
     }
   });
 });
-define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
-  "use strict";
-
-  module.exports = React.createClass({
-    displayName: "GameboardSurface",
-
-    render: function render() {
-      return React.createElement("div", {
-        id: "gameboard-surface",
-        className: this.props.state,
-        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
-    }
-  });
-});
 define("gameboard/winner-message/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
   "use strict";
 
@@ -21441,44 +21382,24 @@ define("gameboard/winner-message/model", ["exports", "module", "util/mediator"],
   var publish = _utilMediator.publish;
   module.exports = React.createClass({
     displayName: "WinnerMessage",
-    sound: null,
-
-    getInitialState: function getInitialState() {
-      return {
-        className: "",
-        player: ""
-      };
-    },
-
-    componentWillMount: function componentWillMount() {
-      subscribe("Player::win", this.playerWins);
-    },
-
-    playerWins: function playerWins(player) {
-      this.setState({
-        className: "active",
-        player: player
-      });
-    },
 
     playAgain: function playAgain() {
       publish("Game::restart");
-      this.setState({
-        className: ""
-      });
+      this.setState({ className: "", player: "" });
     },
 
     goToMenu: function goToMenu() {
       publish("Game::end");
-      this.setState({
-        className: ""
-      });
+      this.setState({ className: "", player: "" });
     },
 
     render: function render() {
+      var className = this.props.winningPlayer ? "active" : "";
+      var player = this.props.winningPlayer || {};
+
       return React.createElement(
         "div",
-        { id: "winner-message", className: this.state.className },
+        { id: "winner-message", className: className },
         React.createElement(
           "div",
           { id: "message" },
@@ -21489,12 +21410,12 @@ define("gameboard/winner-message/model", ["exports", "module", "util/mediator"],
             "“Champion”"
           ),
           "is hereby awarded to the respected ",
-          this.state.player.type,
+          player.type,
           ",",
           React.createElement(
             "span",
             { className: "name" },
-            this.state.player.name
+            player.name
           )
         ),
         React.createElement(

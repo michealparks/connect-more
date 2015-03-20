@@ -8,9 +8,6 @@ import Sound       from 'sound/model';
 
 class GameController {
   constructor(config) {
-    subscribe('Column::ptrup', this.onPlayerMove.bind(this));
-    subscribe('Player:win', this.onPlayerWin.bind(this));
-
     window.addEventListener('resize', () => {
       this.tileSize = window.innerWidth/this.grid.columns;
       if (this.tileSize > 100) this.tileSize = 100;
@@ -23,6 +20,7 @@ class GameController {
     this.tileSize = window.innerWidth/this.grid.columns;
     this.canMove = true;
     this.hasEnded = false;
+    this.winningPlayer = false;
     this.players = config.players.map((config) => new Player(config));
     this.player = this.players[0];
 
@@ -32,52 +30,50 @@ class GameController {
     this.update();
   }
 
-  onPlayerWin() {
+  onWin() {
     this.hasEnded = true;
+    if (this.winningPlayer.type == 'computer') {
+      Sound.play('loseBackground');
+    } else {
+      Sound.play('winBackground');
+    }
   }
 
   onPlayerMove(column) {
-    console.log(this)
     if (! this.canMove || this.hasEnded) return;
 
     Sound.playHitEffect();
-    this.player
+    this.winningPlayer = this.player
       .beginMove()
       .makeMove(this.grid, column)
       .endMove(this.grid);
-
-    console.log('here')
     this.update();
 
-    window.setTimeout(() => {
-      if (this.hasEnded) return;
+    if (this.winningPlayer) return this.onWin();
 
-      this.nextPlayer();
+    this.nextPlayer();
+    if (this.player.type == 'computer') {
+      this.canMove = false;
+      window.setTimeout(this.computerMove, 1000);
+    }
+  }
 
-      let computerMove = () => {
-        Sound.playHitEffect();
-        this.player
-          .beginMove()
-          .decideMove(this.grid, this.players)
-          .endMove(this.grid);
+  onComputerMove() {
+    Sound.playHitEffect();
+    this.winningPlayer = this.player
+      .beginMove()
+      .decideMove(this.grid, this.players)
+      .endMove(this.grid);
+    this.update();
 
-        this.update();
-        this.nextPlayer();
+    if (this.winningPlayer) return this.onWin();
 
-        if (this.player.type == 'computer') {
-          window.setTimeout(computerMove, 1000);
-        } else {
-          this.canMove = true;
-        }
-      }
-
-      if (this.player.type == 'computer') {
-        this.canMove = false;
-        window.setTimeout(computerMove, 1000);
-      }
-    }, 300);
-
-    
+    this.nextPlayer();
+    if (this.player.type == 'computer') {
+      window.setTimeout(this.computerMove, 1000);
+    } else {
+      this.canMove = true;
+    }
   }
 
   nextPlayer() {
@@ -89,6 +85,7 @@ class GameController {
   update() {
     React.render(
       <Gameboard 
+        winningPlayer={this.winningPlayer}
         onPlayerMove={this.onPlayerMove.bind(this)}
         grid={this.grid} 
         tileSize={this.tileSize} />,

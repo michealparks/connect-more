@@ -49,7 +49,8 @@ export default React.createClass({
     this.setState({ grid: this.state.grid });
     this.nextPlayer();
 
-    if (this.state.grid.isFilled()) return;
+    if (this.state.grid.isFilled() || 
+      document.body.classList.contains('in-game')) return;
 
     this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
   },

@@ -40,9 +40,7 @@ export default React.createClass({
 
     if (this.props.grid.data[id].indexOf(-1) == -1) return;
 
-    console.log(id)
     this.props.onPlayerMove(parseInt(id, 10))
-    //publish('Column::ptrup', );
   },
 
   render() {
@@ -66,7 +64,7 @@ export default React.createClass({
         <GameboardSurface 
           width={this.props.grid.columns}
           tileSize={this.props.tileSize} />
-        <WinnerMessage />
+        <WinnerMessage winningPlayer={this.props.winningPlayer} />
       </section>
     );
   }

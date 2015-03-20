@@ -13,14 +13,6 @@ React.initializeTouchEvents(true)
 
 init();
 
-subscribe('Player::win', (player) => {
-  if (player.type == 'computer') {
-    Sound.play('loseBackground');
-  } else {
-    Sound.play('winBackground');
-  }
-});
-
 subscribe('Game::restart', onStartGame);
 
 subscribe('Game::end', () => {

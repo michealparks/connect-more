@@ -118,6 +118,7 @@ export default class Grid {
     // Vertical test going down
     for (let i = y+1; i < h; i++) {
       if (grid[x][i] == p) m.push({ x, y: i });
+      else break;
     }
 
     if (m.length >= c) return m;
@@ -126,22 +127,24 @@ export default class Grid {
     // Horizontal test moving left and right.
     for (let i = x-1; i > -1; i--) {
       if (grid[i] && grid[i][y] == p) m.unshift({ x: i, y });
+      else break;
     }
     for (let i = x+1; i < w; i++) {
       if (grid[i] && grid[i][y] == p) m.push({ x: i, y });
+      else break;
     }
 
-    if (m.length >= c) {
-      return m;
-    }
+    if (m.length >= c) return m;
     else m = [{ x, y }];
 
     // Diagonal test moving up-left and down-right
     for (let i = x-1, j = y-1; i > -1 && j > -1; i--, j--) {
       if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });
+      else break;
     }
     for (let i = x+1, j = y+1; i < w && j < h; i++, j++) {
       if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });
+      else break;
     }
 
     if (m.length >= c) return m;
@@ -150,9 +153,11 @@ export default class Grid {
     // Diagonal test moving down-right and up-left
     for (let i = x+1, j = y-1; i < w && j > -1; i++, j--) {
       if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });
+      else break;
     }
     for (let i = x-1, j = y+1; i > -1 && j < h; i--, j++) {
       if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });
+      else break;
     }
 
     if (m.length >= c) return m;
