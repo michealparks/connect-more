@@ -6,6 +6,7 @@ import {publish}        from 'util/mediator';
 
 export default React.createClass({
   displayName: 'Gameboard',
+  column: 0,
 
   getInitialState() {
     const width = this.props.grid.columns * this.props.tileSize;
@@ -23,44 +24,35 @@ export default React.createClass({
   },
 
   onTouchMove(e) {
-    let target = e.target;
-    while (target.className !== 'gameboard-column') {
-      target = target.parentNode;
-      if (target == null) return;
+    this.column = Math.floor( e.changedTouches[0].pageX / this.props.tileSize );
+    if (this.column !== this.state.hovered) {
+      this.setState({hovered: this.column});
     }
   },
 
   onTouchEnd(e) {
-    let target = e.target;
-    while (target.className !== 'gameboard-column') {
-      target = target.parentNode;
-      if (target == null) return;
-    }
-
-    const id = parseInt(target.id, 10);
-
-    if (this.props.grid.data[id].indexOf(-1) == -1) return;
-
-    this.props.onPlayerMove(parseInt(id, 10))
+    this.props.onPlayerMove(this.column);
   },
 
   render() {
-    const columns = this.props.grid.data.map((column, i) =>
-      <GameboardColumn 
+    const columns = this.props.grid.data.map((column, i) => {
+      return <GameboardColumn 
         onPlayerMove={this.props.onPlayerMove}
         key={i}
         id={i}
         data={column}
         height={column.length} 
+        hovered={this.state.hovered == i}
         tileSize={this.props.tileSize} />
-    );
+    });
 
     return (
       <section 
-        style={this.state.style} 
-        id='gameboard'
         onTouchMove={this.onTouchMove}
-        onTouchEnd={this.onTouchEnd} >
+        onTouchEnd={this.onTouchEnd}
+
+        style={this.state.style} 
+        id='gameboard'>
         <div id='current-player' className={this.state.playerClass}>{this.props.currentPlayer? this.props.currentPlayer.name: ''}</div>
         {columns}
         <GameboardSurface

@@ -20480,6 +20480,7 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
   var publish = _utilMediator.publish;
   module.exports = React.createClass({
     displayName: "Gameboard",
+    column: 0,
 
     getInitialState: function getInitialState() {
       var width = this.props.grid.columns * this.props.tileSize;
@@ -20496,29 +20497,14 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
     },
 
     onTouchMove: function onTouchMove(e) {
-      var target = e.target;
-      while (target.className !== "gameboard-column") {
-        target = target.parentNode;
-        if (target == null) {
-          return;
-        }
+      this.column = Math.floor(e.changedTouches[0].pageX / this.props.tileSize);
+      if (this.column !== this.state.hovered) {
+        this.setState({ hovered: this.column });
       }
     },
 
     onTouchEnd: function onTouchEnd(e) {
-      var target = e.target;
-      while (target.className !== "gameboard-column") {
-        target = target.parentNode;
-        if (target == null) {
-          return;
-        }
-      }
-
-      var id = parseInt(target.id, 10);
-
-      if (this.props.grid.data[id].indexOf(-1) == -1) {
-        return;
-      }this.props.onPlayerMove(parseInt(id, 10));
+      this.props.onPlayerMove(this.column);
     },
 
     render: function render() {
@@ -20531,16 +20517,18 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
           id: i,
           data: column,
           height: column.length,
+          hovered: _this.state.hovered == i,
           tileSize: _this.props.tileSize });
       });
 
       return React.createElement(
         "section",
         {
-          style: this.state.style,
-          id: "gameboard",
           onTouchMove: this.onTouchMove,
-          onTouchEnd: this.onTouchEnd },
+          onTouchEnd: this.onTouchEnd,
+
+          style: this.state.style,
+          id: "gameboard" },
         React.createElement(
           "div",
           { id: "current-player", className: this.state.playerClass },
@@ -21324,6 +21312,73 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     if (!result) throw new Error("No listener was unsubscribed.");
   }
 });
+define("gameboard/gameboard-column/model", ["exports", "module", "util/device", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _utilDevice, _gameboardGameboardColumnGameboardTileModel) {
+  "use strict";
+
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var hasTouch = _utilDevice.hasTouch;
+
+  var GameboardTile = _interopRequire(_gameboardGameboardColumnGameboardTileModel);
+
+  module.exports = React.createClass({
+    displayName: "GameboardColumn",
+
+    getInitialState: function getInitialState() {
+      return {
+        hovered: this.props.hovered || -1
+      };
+    },
+
+    onMouseOver: function onMouseOver() {
+      var columnData = this.props.data;
+      var i = columnData.length;
+      while (i-- > 0) {
+        if (columnData[i] == -1) {
+          return this.setState({ hovered: i });
+        }
+      }
+      this.setState({ hovered: -1 });
+    },
+
+    onMouseLeave: function onMouseLeave() {
+      this.setState({ hovered: -1 });
+    },
+
+    onMouseUp: function onMouseUp(e) {
+      if (this.props.data.indexOf(-1) == -1) {
+        return;
+      }this.props.onPlayerMove(parseInt(e.currentTarget.id, 10));
+    },
+
+    render: function render() {
+      var _this = this;
+
+      var tiles = this.props.data.map(function (tile, i) {
+        return React.createElement(GameboardTile, {
+          key: i,
+          className: _this.state.hovered == i ? "hovered" : "",
+          tileSize: _this.props.tileSize,
+          playerClass: tile > -1 ? "p-" + tile : "" });
+      });
+
+      return React.createElement(
+        "div",
+        {
+          onMouseOver: hasTouch ? null : this.onMouseOver,
+          onMouseLeave: hasTouch ? null : this.onMouseLeave,
+          onMouseUp: hasTouch ? null : this.onMouseUp,
+          id: this.props.id,
+          style: {
+            height: "" + this.props.tileSize * this.props.height + "px",
+            width: "" + this.props.tileSize + "px"
+          },
+          className: "gameboard-column " + (this.props.hovered ? "hovered" : "") },
+        tiles
+      );
+    }
+  });
+});
 define("gameboard/gameboard-surface/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
   "use strict";
 
@@ -21354,79 +21409,6 @@ define("gameboard/gameboard-surface/model", ["exports", "module", "util/device",
           this.props.nConnect,
           " to connect."
         )
-      );
-    }
-  });
-});
-define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _gameboardGameboardColumnGameboardTileModel) {
-  "use strict";
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-  var GameboardTile = _interopRequire(_gameboardGameboardColumnGameboardTileModel);
-
-  module.exports = React.createClass({
-    displayName: "GameboardColumn",
-
-    getInitialState: function getInitialState() {
-      return {
-        hovered: this.props.hovered || -1
-      };
-    },
-
-    onMouseOver: function onMouseOver() {
-      if (window.ontouchstart !== undefined) {
-        return;
-      }var columnData = this.props.data;
-      var i = columnData.length;
-      while (i-- > 0) {
-        if (columnData[i] == -1) {
-          return this.setState({ hovered: i });
-        }
-      }
-      this.setState({ hovered: -1 });
-    },
-
-    onMouseLeave: function onMouseLeave() {
-      if (window.ontouchstart !== undefined) {
-        return;
-      }this.setState({ hovered: -1 });
-    },
-
-    onMouseUp: function onMouseUp(e) {
-      if (window.ontouchstart !== undefined) {
-        return;
-      }if (this.props.data.indexOf(-1) == -1) {
-        return;
-      }this.props.onPlayerMove(parseInt(e.currentTarget.id, 10));
-    },
-
-    render: function render() {
-      var _this = this;
-
-      var tiles = this.props.data.map(function (tile, i) {
-        return React.createElement(GameboardTile, {
-          key: i,
-          className: _this.state.hovered == i ? "hovered" : "",
-          tileSize: _this.props.tileSize,
-          playerClass: tile > -1 ? "p-" + tile : "" });
-      });
-
-      return React.createElement(
-        "div",
-        {
-          onTouchMove: this.onMouseOver,
-          onMouseOver: this.onMouseOver,
-          onTouchStart: this.onMouseOver,
-          onMouseLeave: this.onMouseLeave,
-          onMouseUp: this.onMouseUp,
-          id: this.props.id,
-          style: {
-            height: "" + this.props.tileSize * this.props.height + "px",
-            width: "" + this.props.tileSize + "px"
-          },
-          className: "gameboard-column" },
-        tiles
       );
     }
   });

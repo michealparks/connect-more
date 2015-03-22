@@ -1,3 +1,5 @@
+import {hasTouch} from 'util/device';
+
 import GameboardTile from 'gameboard/gameboard-column/gameboard-tile/model';
 
 export default React.createClass({
@@ -10,8 +12,6 @@ export default React.createClass({
   },
 
   onMouseOver() {
-    if (window.ontouchstart !== undefined) return;
-
     const columnData = this.props.data;
     let i = columnData.length;
     while (i-- > 0) {
@@ -23,13 +23,10 @@ export default React.createClass({
   },
 
   onMouseLeave() {
-    if (window.ontouchstart !== undefined) return;
-    
     this.setState({hovered: -1});
   },
 
   onMouseUp(e) {
-    if (window.ontouchstart !== undefined) return;
     if (this.props.data.indexOf(-1) == -1) return;
 
     this.props.onPlayerMove(parseInt(e.currentTarget.id, 10))
@@ -46,17 +43,15 @@ export default React.createClass({
 
     return (
       <div 
-        onTouchMove={this.onMouseOver}
-        onMouseOver={this.onMouseOver}
-        onTouchStart={this.onMouseOver}
-        onMouseLeave={this.onMouseLeave}
-        onMouseUp={this.onMouseUp}
+        onMouseOver={hasTouch? null: this.onMouseOver}
+        onMouseLeave={hasTouch? null: this.onMouseLeave}
+        onMouseUp={hasTouch? null: this.onMouseUp}
         id={this.props.id}
         style={{
-          height: `${this.props.tileSize * this.props.height}px`, 
-          width: `${this.props.tileSize}px`
+          'height': `${this.props.tileSize * this.props.height}px`, 
+          'width': `${this.props.tileSize}px`
         }}
-        className={`gameboard-column`} >
+        className={`gameboard-column ${this.props.hovered? 'hovered': ''}`} >
         {tiles}
       </div>
     );
