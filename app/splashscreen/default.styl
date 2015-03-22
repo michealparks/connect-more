@@ -1,6 +1,7 @@
 body.in-game
   #splashscreen
-    transform translate(0, 60px)
+    opacity 0
+    transform translate(0, -60px)
     
 body:not(.in-game)
   #splashscreen
@@ -11,10 +12,13 @@ body:not(.in-game)
   z-index -1
   fullSize()
   background-color #eee
-  transition transform 700ms $ease, opacity 300ms
+  transition transform 700ms $ease, opacity 700ms
 
   #gameboard
     pointer-events none
+    
+  #gameboard-surface
+    display none
   
   .gameboard-tile
   .gameboard-tile .shadow
