@@ -11,8 +11,8 @@ export default React.createClass({
         className={`${this.props.playerClass} gameboard-tile`}>
         <div
           style={{
-            width: `${this.props.tileSize-10}px`, 
-            height: `${this.props.tileSize-10}px`
+            width: `${this.props.tileSize-14}px`, 
+            height: `${this.props.tileSize-14}px`
           }}
           className={`${this.props.className} shadow`}></div>
         <div 

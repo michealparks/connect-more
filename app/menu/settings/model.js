@@ -1,3 +1,5 @@
+import {hasTouch} from 'util/device';
+
 import Sound from 'sound/model';
 
 export default React.createClass({
@@ -62,7 +64,6 @@ export default React.createClass({
 
   toggleSound() {
     const newState = ! this.state.sound;
-    console.log(newState)
     this.setState({sound: newState})
     Sound.disable(newState);
   },
@@ -77,30 +78,30 @@ export default React.createClass({
       <div id='settings'>
         <div>
           <div id='num-connect' className='container' data-num={this.state.numConnect}>
-            <span onClick={this.changeConnect} className='option num-connect'>3</span>
-            <span onClick={this.changeConnect} className='option num-connect'>4</span>
-            <span onClick={this.changeConnect} className='option num-connect'>5</span>
+            <span onTouchEnd={this.changeConnect} onClick={hasTouch? null: this.changeConnect} className='option num-connect'>3</span>
+            <span onTouchEnd={this.changeConnect} onClick={hasTouch? null: this.changeConnect} className='option num-connect'>4</span>
+            <span onTouchEnd={this.changeConnect} onClick={hasTouch? null: this.changeConnect} className='option num-connect'>5</span>
             <span className='title'>to Connect</span>
           </div>
           <div id='num-human-players' className='container' data-num={this.state.numHumans}>
-            <span onClick={this.changePlayerNum} className='option num-human-players'>1</span>
-            <span onClick={this.changePlayerNum} className='option num-human-players'>2</span>
-            <span onClick={this.changePlayerNum} className='option num-human-players'>3</span>
-            <span onClick={this.changePlayerNum} className='option num-human-players'>4</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-human-players'>1</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-human-players'>2</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-human-players'>3</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-human-players'>4</span>
             <span className='title'>Human Players</span>
           </div>
           <div id='num-computer-players' className='container' data-num={this.state.numComputers}>
-            <span onClick={this.changePlayerNum} className='option num-computer-players'>0</span>
-            <span onClick={this.changePlayerNum} className='option num-computer-players'>1</span>
-            <span onClick={this.changePlayerNum} className='option num-computer-players'>2</span>
-            <span onClick={this.changePlayerNum} className='option num-computer-players'>3</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-computer-players'>0</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-computer-players'>1</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-computer-players'>2</span>
+            <span onTouchEnd={this.changePlayerNum} onClick={hasTouch? null: this.changePlayerNum} className='option num-computer-players'>3</span>
             <span className='title'>Computer Players</span>
           </div>
         </div>
-        <div id='btn-ammend' onClick={this.onSubmit}>Ammend registry</div>
+        <div id='btn-ammend' onTouchEnd={this.onSubmit} onClick={hasTouch? null: this.onSubmit}>Ammend registry</div>
         <div id='btn-sound-state' className={this.state.sound? 'on': 'off'}>
-          <div onClick={this.toggleSound} className='sound-option'>Sound on</div>
-          <div onClick={this.toggleSound} className='sound-option'>Sound off</div>
+          <div onTouchEnd={this.toggleSound} onClick={hasTouch? null: this.toggleSound} className='sound-option'>Sound on</div>
+          <div onTouchEnd={this.toggleSound} onClick={hasTouch? null: this.toggleSound} className='sound-option'>Sound off</div>
         </div>
       </div>
     );

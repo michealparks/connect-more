@@ -55,7 +55,6 @@ class GameController {
     this.nextPlayer();
     this.update();
 
-    console.log(this.player.type)
     if (this.player.type == 'computer') {
       this.canMove = false;
       window.setTimeout(this.onComputerMove.bind(this), 1000);

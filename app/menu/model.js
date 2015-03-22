@@ -1,4 +1,5 @@
-import Settings from 'menu/settings/model';
+import {hasTouch} from 'util/device';
+import Settings   from 'menu/settings/model';
 
 export default React.createClass({
   displayName: 'Menu',
@@ -15,11 +16,11 @@ export default React.createClass({
     setTimeout(() => document.getElementById('title').classList.add('active'), 100)
   },
 
-  play() {
+  play(e) {
     this.props.onStartGame();
   },
 
-  settings() {
+  settings(e) {
     this.setState({
       menuState: this.state.menuState == 'settings'? '': 'settings'
     });
@@ -42,8 +43,14 @@ export default React.createClass({
         onTouchEnd={this.skipIntro}>
         <div id='title'>
           Connect More
-          <div onClick={this.play} id='btn-play'>I accept</div>
-          <div onClick={this.settings} id='btn-settings'>Arrangements</div>
+          <div 
+            onTouchEnd={this.play}
+            onClick={hasTouch? null: this.play} 
+            id='btn-play'>I accept</div>
+          <div 
+            onTouchEnd={this.settings}
+            onClick={hasTouch? null: this.settings} 
+            id='btn-settings'>Arrangements</div>
         </div>
         <Settings onSubmit={this.settings} onSettingsChange={this.props.onSettingsChange} />
       </div>

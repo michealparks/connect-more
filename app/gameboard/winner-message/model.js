@@ -1,4 +1,5 @@
-import {subscribe, publish} from 'util/mediator';
+import {hasTouch} from 'util/device';          
+import {publish}  from 'util/mediator';
 
 export default React.createClass({
   displayName: 'WinnerMessage',
@@ -23,8 +24,8 @@ export default React.createClass({
           The title of <span className='champion'>&ldquo;Champion&rdquo;</span> 
           is hereby awarded to the respected {player.type}, 
           <span className='name'>{player.name}</span></div>
-        <div onClick={this.playAgain} id='btn-play-again'>Play again</div>
-        <div onClick={this.goToMenu} id='btn-menu'>Return to menu</div>
+        <div onTouchEnd={this.playAgain} onClick={hasTouch? null: this.playAgain} id='btn-play-again'>Play again</div>
+        <div onTouchEnd={this.goToMenu} onClick={hasTouch? null: this.goToMenu} id='btn-menu'>Return to menu</div>
       </div>
     );
   }

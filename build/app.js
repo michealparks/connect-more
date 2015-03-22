@@ -20419,7 +20419,6 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
           }this.nextPlayer();
           this.update();
 
-          console.log(this.player.type);
           if (this.player.type == "computer") {
             this.canMove = false;
             window.setTimeout(this.onComputerMove.bind(this), 1000);
@@ -20748,10 +20747,12 @@ define("grid/model", ["exports", "module"], function (exports, module) {
 
   module.exports = Grid;
 });
-define("menu/model", ["exports", "module", "menu/settings/model"], function (exports, module, _menuSettingsModel) {
+define("menu/model", ["exports", "module", "util/device", "menu/settings/model"], function (exports, module, _utilDevice, _menuSettingsModel) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var hasTouch = _utilDevice.hasTouch;
 
   var Settings = _interopRequire(_menuSettingsModel);
 
@@ -20772,11 +20773,11 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
       }, 100);
     },
 
-    play: function play() {
+    play: function play(e) {
       this.props.onStartGame();
     },
 
-    settings: function settings() {
+    settings: function settings(e) {
       this.setState({
         menuState: this.state.menuState == "settings" ? "" : "settings"
       });
@@ -20804,12 +20805,18 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
           "Connect More",
           React.createElement(
             "div",
-            { onClick: this.play, id: "btn-play" },
+            {
+              onTouchEnd: this.play,
+              onClick: hasTouch ? null : this.play,
+              id: "btn-play" },
             "I accept"
           ),
           React.createElement(
             "div",
-            { onClick: this.settings, id: "btn-settings" },
+            {
+              onTouchEnd: this.settings,
+              onClick: hasTouch ? null : this.settings,
+              id: "btn-settings" },
             "Arrangements"
           )
         ),
@@ -20931,10 +20938,8 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
           // (2)
           for (var i = 0, player = undefined; player = players[i]; i++) {
             for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
-              console.log(player.longestChains);
               if (chain.length == grid.nConnect - 1) {
                 var data = grid.findChainContinuingColumn(chain);
-                console.log(data);
                 if (data.x > -1) {
                   return this.makeMove(grid, data.x);
                 }
@@ -21319,6 +21324,40 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     if (!result) throw new Error("No listener was unsubscribed.");
   }
 });
+define("gameboard/gameboard-surface/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
+  "use strict";
+
+  var hasTouch = _utilDevice.hasTouch;
+  var publish = _utilMediator.publish;
+  module.exports = React.createClass({
+    displayName: "GameboardSurface",
+
+    goToMenu: function goToMenu() {
+      publish("Game::end");
+    },
+
+    render: function render() {
+      return React.createElement(
+        "div",
+        {
+          id: "gameboard-surface",
+          className: this.props.state,
+          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
+        React.createElement(
+          "div",
+          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
+          "End Game"
+        ),
+        React.createElement(
+          "div",
+          { id: "n-connect" },
+          this.props.nConnect,
+          " to connect."
+        )
+      );
+    }
+  });
+});
 define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _gameboardGameboardColumnGameboardTileModel) {
   "use strict";
 
@@ -21392,43 +21431,10 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
     }
   });
 });
-define("gameboard/gameboard-surface/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
+define("gameboard/winner-message/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
   "use strict";
 
-  var publish = _utilMediator.publish;
-  module.exports = React.createClass({
-    displayName: "GameboardSurface",
-
-    goToMenu: function goToMenu() {
-      publish("Game::end");
-    },
-
-    render: function render() {
-      return React.createElement(
-        "div",
-        {
-          id: "gameboard-surface",
-          className: this.props.state,
-          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
-        React.createElement(
-          "div",
-          { onClick: this.goToMenu, id: "btn-menu" },
-          "End Game"
-        ),
-        React.createElement(
-          "div",
-          { id: "n-connect" },
-          this.props.nConnect,
-          " to connect."
-        )
-      );
-    }
-  });
-});
-define("gameboard/winner-message/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
-  "use strict";
-
-  var subscribe = _utilMediator.subscribe;
+  var hasTouch = _utilDevice.hasTouch;
   var publish = _utilMediator.publish;
   module.exports = React.createClass({
     displayName: "WinnerMessage",
@@ -21470,22 +21476,24 @@ define("gameboard/winner-message/model", ["exports", "module", "util/mediator"],
         ),
         React.createElement(
           "div",
-          { onClick: this.playAgain, id: "btn-play-again" },
+          { onTouchEnd: this.playAgain, onClick: hasTouch ? null : this.playAgain, id: "btn-play-again" },
           "Play again"
         ),
         React.createElement(
           "div",
-          { onClick: this.goToMenu, id: "btn-menu" },
+          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
           "Return to menu"
         )
       );
     }
   });
 });
-define("menu/settings/model", ["exports", "module", "sound/model"], function (exports, module, _soundModel) {
+define("menu/settings/model", ["exports", "module", "util/device", "sound/model"], function (exports, module, _utilDevice, _soundModel) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var hasTouch = _utilDevice.hasTouch;
 
   var Sound = _interopRequire(_soundModel);
 
@@ -21550,7 +21558,6 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
 
     toggleSound: function toggleSound() {
       var newState = !this.state.sound;
-      console.log(newState);
       this.setState({ sound: newState });
       Sound.disable(newState);
     },
@@ -21572,17 +21579,17 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
             { id: "num-connect", className: "container", "data-num": this.state.numConnect },
             React.createElement(
               "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
+              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
               "3"
             ),
             React.createElement(
               "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
+              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
               "4"
             ),
             React.createElement(
               "span",
-              { onClick: this.changeConnect, className: "option num-connect" },
+              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
               "5"
             ),
             React.createElement(
@@ -21596,22 +21603,22 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
             { id: "num-human-players", className: "container", "data-num": this.state.numHumans },
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
               "1"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
               "2"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
               "3"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-human-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
               "4"
             ),
             React.createElement(
@@ -21625,22 +21632,22 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
             { id: "num-computer-players", className: "container", "data-num": this.state.numComputers },
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
               "0"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
               "1"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
               "2"
             ),
             React.createElement(
               "span",
-              { onClick: this.changePlayerNum, className: "option num-computer-players" },
+              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
               "3"
             ),
             React.createElement(
@@ -21652,7 +21659,7 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
         ),
         React.createElement(
           "div",
-          { id: "btn-ammend", onClick: this.onSubmit },
+          { id: "btn-ammend", onTouchEnd: this.onSubmit, onClick: hasTouch ? null : this.onSubmit },
           "Ammend registry"
         ),
         React.createElement(
@@ -21660,12 +21667,12 @@ define("menu/settings/model", ["exports", "module", "sound/model"], function (ex
           { id: "btn-sound-state", className: this.state.sound ? "on" : "off" },
           React.createElement(
             "div",
-            { onClick: this.toggleSound, className: "sound-option" },
+            { onTouchEnd: this.toggleSound, onClick: hasTouch ? null : this.toggleSound, className: "sound-option" },
             "Sound on"
           ),
           React.createElement(
             "div",
-            { onClick: this.toggleSound, className: "sound-option" },
+            { onTouchEnd: this.toggleSound, onClick: hasTouch ? null : this.toggleSound, className: "sound-option" },
             "Sound off"
           )
         )
@@ -21690,8 +21697,8 @@ define("gameboard/gameboard-column/gameboard-tile/model", ["exports", "module"],
           className: "" + this.props.playerClass + " gameboard-tile" },
         React.createElement("div", {
           style: {
-            width: "" + (this.props.tileSize - 10) + "px",
-            height: "" + (this.props.tileSize - 10) + "px"
+            width: "" + (this.props.tileSize - 14) + "px",
+            height: "" + (this.props.tileSize - 14) + "px"
           },
           className: "" + this.props.className + " shadow" }),
         React.createElement("div", {
