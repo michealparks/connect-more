@@ -1,21 +1,20 @@
-
-
 body:not(.in-game)
   #gameboard
+    opacity 0
     transform translate(0, 60px)
 
 #gameboard
+  z-index 1
   absolute bottom 10px left
-  transition transform 700ms 200ms $ease
+  transition opacity 400ms, transform 700ms $ease
   
   #current-player
-    fixed top 150px left
+    absolute top -100px left
     width 100%
     text-align center
     font-size 40px
     font-family Great Vibes
-    transition opacity 600ms
-    transition-delay 1000ms
+    opacity 0
     
-    &.faded
-      opacity 0.4
+    &.visible
+      opacity 1

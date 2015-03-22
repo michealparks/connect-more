@@ -23,6 +23,13 @@ export default React.createClass({
     }
   },
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.currentPlayer !== nextProps.currentPlayer) {
+      this.setState({playerClass: ''});
+      window.setTimeout(() => this.setState({playerClass: 'visible'}), 400);
+    }
+  },
+
   onTouchMove(e) {
     this.column = Math.floor( e.changedTouches[0].pageX / this.props.tileSize );
     if (this.column !== this.state.hovered) {
@@ -31,6 +38,8 @@ export default React.createClass({
   },
 
   onTouchEnd(e) {
+    this.column = Math.floor( e.changedTouches[0].pageX / this.props.tileSize );
+    this.setState({hovered: -1});
     this.props.onPlayerMove(this.column);
   },
 
@@ -53,7 +62,11 @@ export default React.createClass({
 
         style={this.state.style} 
         id='gameboard'>
-        <div id='current-player' className={this.state.playerClass}>{this.props.currentPlayer? this.props.currentPlayer.name: ''}</div>
+        <div 
+          id='current-player' 
+          className={`${this.state.playerClass}`}>
+            {this.props.currentPlayer? this.props.currentPlayer.name: ''}
+        </div>
         {columns}
         <GameboardSurface
           nConnect={this.props.grid.nConnect}

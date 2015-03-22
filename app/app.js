@@ -69,8 +69,10 @@ function onSettingsChange(config = {}) {
 }
 
 function onStartGame() {
-  GameController.newGame(gameSettings);
-  document.body.classList.add('in-game');
+  window.setTimeout(() => {
+    GameController.newGame(gameSettings);
+    document.body.classList.add('in-game');
+  }, 100);
 }
 
 function init() {
