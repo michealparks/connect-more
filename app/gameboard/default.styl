@@ -1,3 +1,21 @@
+
+
+body:not(.in-game)
+  #gameboard
+    transform translate(0, 60px)
+
 #gameboard
-  absolute bottom 10px left 
+  absolute bottom 10px left
+  transition transform 700ms 200ms $ease
   
+  #current-player
+    fixed top 150px left
+    width 100%
+    text-align center
+    font-size 40px
+    font-family Great Vibes
+    transition opacity 600ms
+    transition-delay 1000ms
+    
+    &.faded
+      opacity 0.4

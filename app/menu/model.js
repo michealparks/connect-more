@@ -2,10 +2,12 @@ import Settings from 'menu/settings/model';
 
 export default React.createClass({
   displayName: 'Menu',
+  toSkipIntro: false,
 
   getInitialState() {
     return {
-      menuState: 'intro'
+      menuState: 'intro',
+      introState: ''
     };
   },
 
@@ -23,9 +25,21 @@ export default React.createClass({
     });
   },
 
+  skipIntro() {
+    if (! this.toSkipIntro) {
+      this.setState({
+        introState: 'skip-intro'
+      });
+      this.toSkipIntro = true;
+    }
+  },
+
   render() {
     return (
-      <div id='menu' className={this.state.menuState}>
+      <div 
+        id='menu' 
+        className={`${this.state.menuState} ${this.state.introState}`} 
+        onTouchEnd={this.skipIntro}>
         <div id='title'>
           Connect More
           <div onClick={this.play} id='btn-play'>I accept</div>

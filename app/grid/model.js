@@ -31,11 +31,11 @@ export default class Grid {
   }
 
   pieceIsInsertable(column, row) {
-    return (
+    return (Boolean(
       this._data[column] && 
       this._data[column][row] &&
       this._data[column][row] === -1
-    );
+    ));
   }
 
   isFilled() {
@@ -53,16 +53,11 @@ export default class Grid {
 
     if (dir.x == 0) {
 
-      return (
-        this.pieceIsInsertable(column, row-1)
-      );
+      return this.pieceIsInsertable(column, row-1);
 
     } else {
 
-      return (
-        this.pieceIsInsertable(column + dir, row) ||
-        this.pieceIsInsertable(column + dir, row-1)
-      );
+      return this.pieceIsInsertable(column + dir.x, row);
 
     }    
   }

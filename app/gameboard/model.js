@@ -14,10 +14,11 @@ export default React.createClass({
       style: {
         width: `${width}px`,
         height: `${height}px`,
-        margin: `0 -${width/2}px`,
+        margin: `60px -${width/2}px`,
         left: `50%`
       },
-      hovered: -1
+      hovered: -1,
+      playerClass: '',
     }
   },
 
@@ -59,12 +60,15 @@ export default React.createClass({
         style={this.state.style} 
         id='gameboard'
         onTouchMove={this.onTouchMove}
-        onTouchEnd={this.onTouchEnd}>
+        onTouchEnd={this.onTouchEnd} >
+        <div id='current-player' className={this.state.playerClass}>{this.props.currentPlayer? this.props.currentPlayer.name: ''}</div>
         {columns}
-        <GameboardSurface 
+        <GameboardSurface
+          nConnect={this.props.grid.nConnect}
           width={this.props.grid.columns}
           tileSize={this.props.tileSize} />
-        <WinnerMessage winningPlayer={this.props.winningPlayer} />
+        <WinnerMessage
+          winningPlayer={this.props.winningPlayer} />
       </section>
     );
   }

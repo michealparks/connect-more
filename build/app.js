@@ -20411,14 +20411,18 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
             return;
           }Sound.playHitEffect();
           this.winningPlayer = this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
+
           this.update();
 
           if (this.winningPlayer) {
             return this.onWin();
           }this.nextPlayer();
+          this.update();
+
+          console.log(this.player.type);
           if (this.player.type == "computer") {
             this.canMove = false;
-            window.setTimeout(this.computerMove, 1000);
+            window.setTimeout(this.onComputerMove.bind(this), 1000);
           }
         }
       },
@@ -20431,8 +20435,10 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
           if (this.winningPlayer) {
             return this.onWin();
           }this.nextPlayer();
+          this.update();
+
           if (this.player.type == "computer") {
-            window.setTimeout(this.computerMove, 1000);
+            window.setTimeout(this.onComputerMove.bind(this), 1000);
           } else {
             this.canMove = true;
           }
@@ -20447,6 +20453,7 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
       update: {
         value: function update() {
           React.render(React.createElement(Gameboard, {
+            currentPlayer: this.player,
             winningPlayer: this.winningPlayer,
             onPlayerMove: this.onPlayerMove.bind(this),
             grid: this.grid,
@@ -20482,11 +20489,11 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
         style: {
           width: "" + width + "px",
           height: "" + height + "px",
-          margin: "0 -" + width / 2 + "px",
+          margin: "60px -" + width / 2 + "px",
           left: "50%"
         },
-        hovered: -1
-      };
+        hovered: -1,
+        playerClass: "" };
     },
 
     onTouchMove: function onTouchMove(e) {
@@ -20535,11 +20542,18 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
           id: "gameboard",
           onTouchMove: this.onTouchMove,
           onTouchEnd: this.onTouchEnd },
+        React.createElement(
+          "div",
+          { id: "current-player", className: this.state.playerClass },
+          this.props.currentPlayer ? this.props.currentPlayer.name : ""
+        ),
         columns,
         React.createElement(GameboardSurface, {
+          nConnect: this.props.grid.nConnect,
           width: this.props.grid.columns,
           tileSize: this.props.tileSize }),
-        React.createElement(WinnerMessage, { winningPlayer: this.props.winningPlayer })
+        React.createElement(WinnerMessage, {
+          winningPlayer: this.props.winningPlayer })
       );
     }
   });
@@ -20593,7 +20607,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
       },
       pieceIsInsertable: {
         value: function pieceIsInsertable(column, row) {
-          return this._data[column] && this._data[column][row] && this._data[column][row] === -1;
+          return Boolean(this._data[column] && this._data[column][row] && this._data[column][row] === -1);
         }
       },
       isFilled: {
@@ -20620,7 +20634,7 @@ define("grid/model", ["exports", "module"], function (exports, module) {
             return this.pieceIsInsertable(column, row - 1);
           } else {
 
-            return this.pieceIsInsertable(column + dir, row) || this.pieceIsInsertable(column + dir, row - 1);
+            return this.pieceIsInsertable(column + dir.x, row);
           }
         }
       },
@@ -20743,10 +20757,12 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
 
   module.exports = React.createClass({
     displayName: "Menu",
+    toSkipIntro: false,
 
     getInitialState: function getInitialState() {
       return {
-        menuState: "intro"
+        menuState: "intro",
+        introState: ""
       };
     },
 
@@ -20766,10 +20782,22 @@ define("menu/model", ["exports", "module", "menu/settings/model"], function (exp
       });
     },
 
+    skipIntro: function skipIntro() {
+      if (!this.toSkipIntro) {
+        this.setState({
+          introState: "skip-intro"
+        });
+        this.toSkipIntro = true;
+      }
+    },
+
     render: function render() {
       return React.createElement(
         "div",
-        { id: "menu", className: this.state.menuState },
+        {
+          id: "menu",
+          className: "" + this.state.menuState + " " + this.state.introState,
+          onTouchEnd: this.skipIntro },
         React.createElement(
           "div",
           { id: "title" },
@@ -20896,16 +20924,17 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
         value: function decideMove(grid, players) {
           // (1)
-          if (Math.random() < this.errorFactor) {
-            return this.makeMove(grid, util.randomInt(0, grid.columns - 1));
-          }
+          // if (Math.random() < this.errorFactor) {
+          //   return this.makeMove(grid, util.randomInt(0, grid.columns-1));
+          // }
 
           // (2)
           for (var i = 0, player = undefined; player = players[i]; i++) {
             for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
+              console.log(player.longestChains);
               if (chain.length == grid.nConnect - 1) {
                 var data = grid.findChainContinuingColumn(chain);
-
+                console.log(data);
                 if (data.x > -1) {
                   return this.makeMove(grid, data.x);
                 }
@@ -20996,7 +21025,6 @@ define("sound/model", ["exports", "module"], function (exports, module) {
           if (this.playing && !this.enabled) {
             this.fadeOut(this.playing);
           } else {
-            console.log("here");
             this.menuBackground.play();
           }
         }
@@ -21364,17 +21392,36 @@ define("gameboard/gameboard-column/model", ["exports", "module", "gameboard/game
     }
   });
 });
-define("gameboard/gameboard-surface/model", ["exports", "module"], function (exports, module) {
+define("gameboard/gameboard-surface/model", ["exports", "module", "util/mediator"], function (exports, module, _utilMediator) {
   "use strict";
 
+  var publish = _utilMediator.publish;
   module.exports = React.createClass({
     displayName: "GameboardSurface",
 
+    goToMenu: function goToMenu() {
+      publish("Game::end");
+    },
+
     render: function render() {
-      return React.createElement("div", {
-        id: "gameboard-surface",
-        className: this.props.state,
-        style: { width: "" + this.props.width * this.props.tileSize + "px" } });
+      return React.createElement(
+        "div",
+        {
+          id: "gameboard-surface",
+          className: this.props.state,
+          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
+        React.createElement(
+          "div",
+          { onClick: this.goToMenu, id: "btn-menu" },
+          "End Game"
+        ),
+        React.createElement(
+          "div",
+          { id: "n-connect" },
+          this.props.nConnect,
+          " to connect."
+        )
+      );
     }
   });
 });

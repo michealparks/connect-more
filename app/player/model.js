@@ -85,16 +85,17 @@ export default class Player {
   //
   decideMove(grid, players) {
     // (1)
-    if (Math.random() < this.errorFactor) {
-      return this.makeMove(grid, util.randomInt(0, grid.columns-1));
-    }
+    // if (Math.random() < this.errorFactor) {
+    //   return this.makeMove(grid, util.randomInt(0, grid.columns-1));
+    // }
 
     // (2)
     for (let i = 0, player; player = players[i]; i++) {
       for (let j = 0, chain; chain = player.longestChains[j]; j++) {
+        console.log(player.longestChains)
         if (chain.length == grid.nConnect-1) {
           const data = grid.findChainContinuingColumn(chain);
-          
+          console.log(data)
           if (data.x > -1) {
             return this.makeMove(grid, data.x);
           }

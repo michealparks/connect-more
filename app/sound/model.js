@@ -25,7 +25,6 @@ class Sound {
     if (this.playing && ! this.enabled) {
       this.fadeOut(this.playing);
     } else {
-      console.log('here')
       this.menuBackground.play();
     }
   }

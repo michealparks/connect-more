@@ -1,2 +1,30 @@
+@import 'nib'
+
+body:not(.in-game)
+  #gameboard-surface
+    transform translate(0, 60px)
+
 #gameboard-surface
-  height 10px;
+  height 80px
+  background-color #444
+  transition transform 700ms 200ms $ease
+  
+  > div
+    position absolute
+    width 50%
+    font-family Great Vibes
+    text-align center
+    color #ccc
+    font-size 28px
+    
+  #btn-menu
+    left 0
+    height 80px
+    line-height 80px
+    
+  #n-connect
+    right 0
+    height 50px
+    line-height 60px
+    margin 10px 0
+    border-left 1px solid #ccc

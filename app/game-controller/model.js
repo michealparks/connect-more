@@ -47,14 +47,18 @@ class GameController {
       .beginMove()
       .makeMove(this.grid, column)
       .endMove(this.grid);
+
     this.update();
 
     if (this.winningPlayer) return this.onWin();
 
     this.nextPlayer();
+    this.update();
+
+    console.log(this.player.type)
     if (this.player.type == 'computer') {
       this.canMove = false;
-      window.setTimeout(this.computerMove, 1000);
+      window.setTimeout(this.onComputerMove.bind(this), 1000);
     }
   }
 
@@ -69,8 +73,10 @@ class GameController {
     if (this.winningPlayer) return this.onWin();
 
     this.nextPlayer();
+    this.update();
+    
     if (this.player.type == 'computer') {
-      window.setTimeout(this.computerMove, 1000);
+      window.setTimeout(this.onComputerMove.bind(this), 1000);
     } else {
       this.canMove = true;
     }
@@ -85,6 +91,7 @@ class GameController {
   update() {
     React.render(
       <Gameboard 
+        currentPlayer={this.player}
         winningPlayer={this.winningPlayer}
         onPlayerMove={this.onPlayerMove.bind(this)}
         grid={this.grid} 
