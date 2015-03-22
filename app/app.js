@@ -26,6 +26,8 @@ subscribe('Game::end', () => {
   init();
 });
 
+window.addEventListener('touchmove', e => e.preventDefault());
+
 onSettingsChange({
   numConnect: (ls.getItem('connectMore_numConnect') || 4) - 0,
   numHumans: (ls.getItem('connectMore_numHumans') || 1) - 0,

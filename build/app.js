@@ -20283,6 +20283,10 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
     init();
   });
 
+  window.addEventListener("touchmove", function (e) {
+    return e.preventDefault();
+  });
+
   onSettingsChange({
     numConnect: (ls.getItem("connectMore_numConnect") || 4) - 0,
     numHumans: (ls.getItem("connectMore_numHumans") || 1) - 0,
