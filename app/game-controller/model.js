@@ -1,10 +1,9 @@
 import GLOBAL      from 'util/global';
-import {subscribe} from 'util/mediator'
+import {subscribe} from 'util/mediator';
 
 import Player      from 'player/model';
 import Gameboard   from 'gameboard/model';
 import Grid        from 'grid/model';
-import Sound       from 'sound/model';
 
 class GameController {
   constructor(config) {
@@ -26,23 +25,26 @@ class GameController {
 
     if (this.tileSize > 100) this.tileSize = 100;
 
-    Sound.play('gameBackground');
+    // Sound.play('gameBackground');
     this.update();
   }
 
   onWin() {
+    document.body.classList.add('winner');
     this.hasEnded = true;
     if (this.winningPlayer.type == 'computer') {
-      Sound.play('loseBackground');
+      // Sound.play('loseBackground');
     } else {
-      Sound.play('winBackground');
+      // Sound.play('winBackground');
     }
   }
 
   onPlayerMove(column) {
     if (! this.canMove || this.hasEnded) return;
 
-    Sound.playHitEffect();
+    // Tone.startTone(Music.majC[_.randomInt(0, Music.majC.length-1)], 50);
+    // Sound.playHitEffect();
+
     this.winningPlayer = this.player
       .beginMove()
       .makeMove(this.grid, column)
@@ -62,7 +64,7 @@ class GameController {
   }
 
   onComputerMove() {
-    Sound.playHitEffect();
+    // Sound.playHitEffect();
     this.winningPlayer = this.player
       .beginMove()
       .decideMove(this.grid, this.players)

@@ -1,6 +1,11 @@
 import util      from 'util/core';
 import {publish} from 'util/mediator';
 
+import _ from 'util/core';
+
+import Tone  from 'sound/tone'
+import Music from 'sound/music'
+
 export default class Player {
   constructor(config) {
     this.index = config.index;
@@ -8,6 +13,7 @@ export default class Player {
     this.type  = config.type || 'computer';
     this.moves = [];
     this.longestChains = [];
+    this.noteIndex = 0;
 
     if (this.type !== 'computer') return;
 

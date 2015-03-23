@@ -20249,6 +20249,18 @@ var requirejs, require, define;
         jQuery: true
     };
 }());
+Array.prototype.shuffle = function() {
+  var l = this.length + 1;
+  while (l--) {
+    var r = ~~(Math.random() * l);
+    var o = this[r];
+
+    this[r] = this[0];
+    this[0] = o;
+  }
+
+  return this;
+};
 define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "game-controller/model", "sound/model"], function (exports, _utilMediator, _splashscreenModel, _menuModel, _gameControllerModel, _soundModel) {
   "use strict";
 
@@ -20275,6 +20287,7 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
   subscribe("Game::restart", onStartGame);
 
   subscribe("Game::end", function () {
+    document.body.classList.remove("winner");
     document.body.classList.remove("in-game");
     document.querySelector("#menu").classList.add("intro");
 
@@ -20333,12 +20346,13 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
   function onStartGame() {
     window.setTimeout(function () {
       GameController.newGame(gameSettings);
+      document.body.classList.remove("winner");
       document.body.classList.add("in-game");
     }, 100);
   }
 
   function init() {
-    Sound.play("menuBackground");
+    // Sound.play('menuBackground');
 
     React.render(React.createElement(Splashscreen, { state: "visible" }), document.querySelector("#splashscreen-container"));
 
@@ -20348,7 +20362,7 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
       onSettingsChange: onSettingsChange }), document.querySelector("#menu-container"));
   }
 });
-define("game-controller/model", ["exports", "module", "util/global", "util/mediator", "player/model", "gameboard/model", "grid/model", "sound/model"], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel, _soundModel) {
+define("game-controller/model", ["exports", "module", "util/global", "util/mediator", "player/model", "gameboard/model", "grid/model"], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -20366,8 +20380,6 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
   var Gameboard = _interopRequire(_gameboardModel);
 
   var Grid = _interopRequire(_gridModel);
-
-  var Sound = _interopRequire(_soundModel);
 
   var GameController = (function () {
     function GameController(config) {
@@ -20397,25 +20409,24 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
           if (this.tileSize > 100) this.tileSize = 100;
 
-          Sound.play("gameBackground");
+          // Sound.play('gameBackground');
           this.update();
         }
       },
       onWin: {
         value: function onWin() {
+          document.body.classList.add("winner");
           this.hasEnded = true;
-          if (this.winningPlayer.type == "computer") {
-            Sound.play("loseBackground");
-          } else {
-            Sound.play("winBackground");
-          }
+          if (this.winningPlayer.type == "computer") {} else {}
         }
       },
       onPlayerMove: {
         value: function onPlayerMove(column) {
           if (!this.canMove || this.hasEnded) {
             return;
-          }Sound.playHitEffect();
+          } // Tone.startTone(Music.majC[_.randomInt(0, Music.majC.length-1)], 50);
+          // Sound.playHitEffect();
+
           this.winningPlayer = this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
 
           this.update();
@@ -20433,7 +20444,7 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
       },
       onComputerMove: {
         value: function onComputerMove() {
-          Sound.playHitEffect();
+          // Sound.playHitEffect();
           this.winningPlayer = this.player.beginMove().decideMove(this.grid, this.players).endMove(this.grid);
           this.update();
 
@@ -20472,6 +20483,10 @@ define("game-controller/model", ["exports", "module", "util/global", "util/media
 
   module.exports = new GameController();
 });
+
+// Sound.play('loseBackground');
+
+// Sound.play('winBackground');
 define("gameboard/model", ["exports", "module", "gameboard/winner-message/model", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
   "use strict";
 
@@ -20834,7 +20849,7 @@ define("menu/model", ["exports", "module", "util/device", "menu/settings/model"]
     }
   });
 });
-define("player/model", ["exports", "module", "util/core", "util/mediator"], function (exports, module, _utilCore, _utilMediator) {
+define("player/model", ["exports", "module", "util/core", "util/mediator", "sound/tone", "sound/music"], function (exports, module, _utilCore, _utilMediator, _soundTone, _soundMusic) {
   "use strict";
 
   var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -20847,6 +20862,12 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
 
   var publish = _utilMediator.publish;
 
+  var _ = _interopRequire(_utilCore);
+
+  var Tone = _interopRequire(_soundTone);
+
+  var Music = _interopRequire(_soundMusic);
+
   var Player = (function () {
     function Player(config) {
       _classCallCheck(this, Player);
@@ -20856,6 +20877,7 @@ define("player/model", ["exports", "module", "util/core", "util/mediator"], func
       this.type = config.type || "computer";
       this.moves = [];
       this.longestChains = [];
+      this.noteIndex = 0;
 
       if (this.type !== "computer") {
         return;
@@ -21106,6 +21128,392 @@ define("sound/model", ["exports", "module"], function (exports, module) {
 
   module.exports = new Sound();
 });
+define("sound/music", ["exports", "module"], function (exports, module) {
+  "use strict";
+
+  var majC = [246.94, 261.63, 293.66, 329.63, 349.23, 392, 440, 493.88, 523.25, 587.33, 659.26];
+
+  module.exports = {
+    majC: majC
+  };
+});
+define("sound/reverb", ["exports", "module"], function (exports, module) {
+  /**
+   * Simple Reverb constructor.
+   *
+   * @param {AudioContext} context
+   * @param {object} opts
+   * @param {number} opts.seconds
+   * @param {number} opts.decay
+   * @param {boolean} opts.reverse
+   */
+
+  "use strict";
+
+  function SimpleReverb(context, opts) {
+    this.input = this.output = context.createConvolver();
+    this._context = context;
+
+    var p = this.meta.params;
+    opts = opts || {};
+    this._seconds = opts.seconds || p.seconds.defaultValue;
+    this._decay = opts.decay || p.decay.defaultValue;
+    this._reverse = opts.reverse || p.reverse.defaultValue;
+    this._buildImpulse();
+  }
+
+  SimpleReverb.prototype = Object.create(null, {
+
+    /**
+     * AudioNode prototype `connect` method.
+     *
+     * @param {AudioNode} dest
+     */
+
+    connect: {
+      value: function value(dest) {
+        this.output.connect(dest.input ? dest.input : dest);
+      }
+    },
+
+    /**
+     * AudioNode prototype `disconnect` method.
+     */
+
+    disconnect: {
+      value: function value() {
+        this.output.disconnect();
+      }
+    },
+
+    /**
+     * Utility function for building an impulse response
+     * from the module parameters.
+     */
+
+    _buildImpulse: {
+      value: function value() {
+        var rate = this._context.sampleRate,
+            length = rate * this.seconds,
+            decay = this.decay,
+            impulse = this._context.createBuffer(2, length, rate),
+            impulseL = impulse.getChannelData(0),
+            impulseR = impulse.getChannelData(1),
+            n,
+            i;
+
+        for (i = 0; i < length; i++) {
+          n = this.reverse ? length - i : i;
+          impulseL[i] = (Math.random() * 2 - 1) * Math.pow(1 - n / length, decay);
+          impulseR[i] = (Math.random() * 2 - 1) * Math.pow(1 - n / length, decay);
+        }
+
+        this.input.buffer = impulse;
+      }
+    },
+
+    /**
+     * Module parameter metadata.
+     */
+
+    meta: {
+      value: {
+        name: "SimpleReverb",
+        params: {
+          seconds: {
+            min: 1,
+            max: 50,
+            defaultValue: 3,
+            type: "float"
+          },
+          decay: {
+            min: 0,
+            max: 100,
+            defaultValue: 2,
+            type: "float"
+          },
+          reverse: {
+            min: 0,
+            max: 1,
+            defaultValue: 0,
+            type: "bool"
+          }
+        }
+      }
+    },
+
+    /**
+     * Public parameters.
+     */
+
+    seconds: {
+      enumerable: true,
+      get: function get() {
+        return this._seconds;
+      },
+      set: function set(value) {
+        this._seconds = value;
+        this._buildImpulse();
+      }
+    },
+
+    decay: {
+      enumerable: true,
+      get: function get() {
+        return this._decay;
+      },
+      set: function set(value) {
+        this._decay = value;
+        this._buildImpulse();
+      }
+    },
+
+    reverse: {
+      enumerable: true,
+      get: function get() {
+        return this._reverse;
+      },
+      set: function set(value) {
+        this._reverse = value;
+        this._buildImpulse();
+      }
+    }
+
+  });
+
+  /**
+   * Exports.
+   */
+
+  module.exports = SimpleReverb;
+});
+define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], function (exports, module, _soundTools, _soundReverb) {
+  "use strict";
+
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+  var audioContext = _soundTools.audioContext;
+  var fixOscillator = _soundTools.fixOscillator;
+
+  var Reverb = _interopRequire(_soundReverb);
+
+  // Example showing how to produce a tone using Web Audio API.
+  // Load the file webaudio_tools.js before loading this file.
+  // This code will write to a DIV with an id="soundStatus".
+  var oscillator;
+  var amp;
+  var distortion;
+
+  var reverb = new Reverb(audioContext, { seconds: 0.5, decay: 6, reverse: 0 });
+
+  // Create an oscillator and an amplifier.
+  // function initAudio() {
+  // Use audioContext from webaudio_tools.js
+
+  if (audioContext) {
+
+    oscillator = audioContext.createOscillator();
+    fixOscillator(oscillator);
+    oscillator.frequency.value = 440;
+    oscillator.type = "sine";
+    amp = audioContext.createGain();
+    amp.gain.value = 0;
+
+    // Connect oscillator to amp and amp to the mixer of the audioContext.
+    // This is like connecting cables between jacks on a modular synth.
+    oscillator.connect(amp);
+    amp.connect(reverb.input);
+    reverb.connect(audioContext.destination);
+    oscillator.start(0);
+    // writeMessageToID( "soundStatus", "<p>Audio initialized.</p>");
+  }
+
+  // }
+
+  // Set the frequency of the oscillator and start it running.
+  function startTone(frequency, time) {
+    var now = audioContext.currentTime;
+
+    oscillator.frequency.setValueAtTime(frequency, now);
+
+    // Ramp up the gain so we can hear the sound.
+    // We can ramp smoothly to the desired value.
+    // First we should cancel any previous scheduled events that might interfere.
+    amp.gain.cancelScheduledValues(now);
+    // Anchor beginning of ramp at current value.
+    amp.gain.setValueAtTime(amp.gain.value, now);
+    amp.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.005);
+
+    window.setTimeout(stopTone, time);
+
+    // writeMessageToID( "soundStatus", "<p>Play tone at frequency = " + frequency  + "</p>");
+  }
+
+  function stopTone() {
+    var now = audioContext.currentTime;
+    amp.gain.cancelScheduledValues(now);
+    amp.gain.setValueAtTime(amp.gain.value, now);
+    amp.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+    // writeMessageToID( "soundStatus", "<p>Stop tone.</p>");
+  }
+
+  module.exports = {
+    startTone: startTone,
+    stopTone: stopTone
+  };
+});
+define("sound/tools", ["exports"], function (exports) {
+  /*
+   * Common tools for use with WebAudio.
+   * 
+   * This code was based on original code by Boris Smus
+   * from: http://www.webaudioapi.com/
+   *
+   * with extensions and modifications by Phil Burk
+   * from http://www.softsynth.com/webaudio/
+   */
+  /*
+   * Licensed under the Apache License, Version 2.0 (the "License");
+   * you may not use this file except in compliance with the License.
+   * You may obtain a copy of the License at
+   *
+   *     http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software
+   * distributed under the License is distributed on an "AS IS" BASIS,
+   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   * See the License for the specific language governing permissions and
+   * limitations under the License.
+   */
+
+  "use strict";
+
+  exports.createAudioContext = createAudioContext;
+
+  // Add missing functions to make the oscillator compatible with the later standard.
+  exports.fixOscillator = fixOscillator;
+  exports.AudioVisualizer = AudioVisualizer;
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function createAudioContext() {
+    var contextClass = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.oAudioContext;
+    if (contextClass) {
+      return new contextClass();
+    } else {
+      return null;
+    }
+  }
+
+  // Start off by initializing a new audioContext.
+  var audioContext = createAudioContext();
+
+  exports.audioContext = audioContext;
+  // shim layer with setTimeout fallback
+  window.requestAnimationFrame = (function () {
+    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (callback) {
+      window.setTimeout(callback, 1000 / 60);
+    };
+  })();
+  function fixOscillator(osc) {
+    if (typeof osc.start == "undefined") {
+      osc.start = function (when) {
+        osc.noteOn(when);
+      };
+    }
+    if (typeof osc.stop == "undefined") {
+      osc.stop = function (when) {
+        osc.noteOff(when);
+      };
+    }
+  }
+
+  function AudioVisualizer(width, height) {
+    this.analyser = audioContext.createAnalyser();
+
+    this.width = width;
+    this.height = height;
+    this.analyser.connect(audioContext.destination);
+    this.analyser.minDecibels = -140;
+    this.analyser.maxDecibels = 0;
+    this.fft_smoothing = 0.6;
+    this.fft_size = 1024;
+
+    this.freqs = new Uint8Array(this.analyser.frequencyBinCount);
+    this.times = new Uint8Array(this.analyser.frequencyBinCount);
+    this.isPlaying = false;
+    this.drawCounter = 0;
+  }
+
+  AudioVisualizer.prototype.startAnimation = function () {
+    this.isPlaying = true;
+    // Start visualizer.
+    window.requestAnimationFrame(this.draw.bind(this));
+  };
+
+  AudioVisualizer.prototype.drawSpectrum = function (drawContext) {
+    this.analyser.smoothingTimeConstant = this.fft_smoothing;
+    this.analyser.fftSize = this.fft_size;
+
+    // Get the frequency data from the currently playing music
+    this.analyser.getByteFrequencyData(this.freqs);
+
+    var width = Math.floor(1 / this.freqs.length, 10);
+
+    drawContext.fillStyle = "hsl(200, 100%, 50%)";
+    // Draw the frequency domain chart.
+    for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
+      var value = this.freqs[i];
+      var percent = value / 256;
+      var height = this.height * percent;
+      var offset = this.height - height - 1;
+      var barWidth = this.width / this.analyser.frequencyBinCount;
+      drawContext.fillRect(i * barWidth, offset, barWidth, height);
+    }
+  };
+
+  AudioVisualizer.prototype.draw = function () {
+    var canvas = document.querySelector("canvas");
+    var drawContext = canvas.getContext("2d");
+    canvas.width = this.width;
+    canvas.height = this.height;
+
+    this.drawSpectrum(drawContext);
+
+    if ((this.drawCounter & 15) == 0) {
+      this.analyser.getByteTimeDomainData(this.times);
+    }
+
+    // Draw the time domain chart.
+    //drawContext.beginPath();
+    drawContext.fillStyle = "black";
+    drawContext.moveTo(0, this.height / 2);
+    var barWidth = this.width / this.analyser.frequencyBinCount;
+    for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
+      var value = this.times[i];
+      var percent = value / 256;
+      var height = this.height * percent;
+      var ypos = this.height - height - 1;
+      var xpos = i * barWidth;
+      drawContext.lineTo(xpos, ypos);
+    }
+    //drawContext.closePath();
+    drawContext.stroke();
+
+    this.drawCounter += 1;
+
+    if (this.isPlaying) {
+      window.requestAnimationFrame(this.draw.bind(this));
+    }
+  };
+
+  AudioVisualizer.prototype.getFrequencyValue = function (freq) {
+    var nyquist = audioContext.sampleRate / 2;
+    var index = Math.round(freq / nyquist * this.freqs.length);
+    return this.freqs[index];
+  };
+});
 define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/model", "player/model", "util/mediator"], function (exports, module, _gameboardModel, _gridModel, _playerModel, _utilMediator) {
   "use strict";
 
@@ -21333,6 +21741,40 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     if (!result) throw new Error("No listener was unsubscribed.");
   }
 });
+define("gameboard/gameboard-surface/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
+  "use strict";
+
+  var hasTouch = _utilDevice.hasTouch;
+  var publish = _utilMediator.publish;
+  module.exports = React.createClass({
+    displayName: "GameboardSurface",
+
+    goToMenu: function goToMenu() {
+      publish("Game::end");
+    },
+
+    render: function render() {
+      return React.createElement(
+        "div",
+        {
+          id: "gameboard-surface",
+          className: this.props.state,
+          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
+        React.createElement(
+          "div",
+          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
+          "End Game"
+        ),
+        React.createElement(
+          "div",
+          { id: "n-connect" },
+          this.props.nConnect,
+          " to connect."
+        )
+      );
+    }
+  });
+});
 define("gameboard/gameboard-column/model", ["exports", "module", "util/device", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _utilDevice, _gameboardGameboardColumnGameboardTileModel) {
   "use strict";
 
@@ -21452,40 +21894,6 @@ define("gameboard/winner-message/model", ["exports", "module", "util/device", "u
           "div",
           { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
           "Return to menu"
-        )
-      );
-    }
-  });
-});
-define("gameboard/gameboard-surface/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
-  "use strict";
-
-  var hasTouch = _utilDevice.hasTouch;
-  var publish = _utilMediator.publish;
-  module.exports = React.createClass({
-    displayName: "GameboardSurface",
-
-    goToMenu: function goToMenu() {
-      publish("Game::end");
-    },
-
-    render: function render() {
-      return React.createElement(
-        "div",
-        {
-          id: "gameboard-surface",
-          className: this.props.state,
-          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
-        React.createElement(
-          "div",
-          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
-          "End Game"
-        ),
-        React.createElement(
-          "div",
-          { id: "n-connect" },
-          this.props.nConnect,
-          " to connect."
         )
       );
     }

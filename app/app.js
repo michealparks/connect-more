@@ -16,6 +16,7 @@ init();
 subscribe('Game::restart', onStartGame);
 
 subscribe('Game::end', () => {
+  document.body.classList.remove('winner');
   document.body.classList.remove('in-game');
   document.querySelector('#menu').classList.add('intro');
 
@@ -71,12 +72,13 @@ function onSettingsChange(config = {}) {
 function onStartGame() {
   window.setTimeout(() => {
     GameController.newGame(gameSettings);
+    document.body.classList.remove('winner');
     document.body.classList.add('in-game');
   }, 100);
 }
 
 function init() {
-  Sound.play('menuBackground');
+  // Sound.play('menuBackground');
 
   React.render(
     <Splashscreen state={'visible'} />,

@@ -25,6 +25,7 @@ gulp.task('javascript', function () {
         console.error(e.message);
         this.emit('end');
       })
+    .pipe(addsrc.prepend('lib/array.js'))
     .pipe(addsrc.prepend('lib/almond.js'))
     .pipe(addsrc.prepend('lib/react/tappable.js'))
     .pipe(addsrc.prepend('lib/react-with-addons.js'))

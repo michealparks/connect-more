@@ -3,7 +3,7 @@ import {publish}  from 'util/mediator';
 
 export default React.createClass({
   displayName: 'WinnerMessage',
-
+  
   playAgain() {
     publish('Game::restart');
     this.setState({className: '', player: ''});
