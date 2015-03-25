@@ -34,7 +34,8 @@ export default class Grid {
     return (Boolean(
       this._data[column] && 
       this._data[column][row] &&
-      this._data[column][row] === -1
+      this._data[column][row] === -1 &&
+      this._data[column][row + 1] !== -1
     ));
   }
 
@@ -51,15 +52,17 @@ export default class Grid {
   canContinueChainInDirection(column, row, dir = { x: 0, y: 0 }) {
     const grid = this._data;
 
-    if (dir.x == 0) {
+    return this.pieceIsInsertable(column + dir.x, row + dir.y)
 
-      return this.pieceIsInsertable(column, row-1);
+    // if (dir.x == 0) {
 
-    } else {
+    //   return this.pieceIsInsertable(column, row-1);
 
-      return this.pieceIsInsertable(column + dir.x, row);
+    // } else if (dir.y == 0) {
 
-    }    
+    //   return this.pieceIsInsertable(column + dir.x, row);
+
+    // }    
   }
 
   canCompleteChain(column, row, dir, needed) {
@@ -87,11 +90,13 @@ export default class Grid {
     const dx2 = last.x - m3.x;
     const dy2 = last.y - m3.y;
 
-    if (this.canContinueChainInDirection(first.x, first.y, { x: dx1, y: dy1 })) {
+    if (this.pieceIsInsertable(first.x + dx1, first.y + dy1)) {
+    // if (this.canContinueChainInDirection(first.x, first.y, { x: dx1, y: dy1 })) {
       return { x: first.x + dx1, y: first.y, dir: { x: dx1, y: dy1 } };
     }
 
-    if (this.canContinueChainInDirection(last.x, last.y, { x: dx2, y: dy2 })) {
+    if (this.pieceIsInsertable(last.x + dx2, last.y + dy2)) {
+    // if (this.canContinueChainInDirection(last.x, last.y, { x: dx2, y: dy2 })) {
       return { x: last.x + dx2, y: first.y, dir: { x: dx2, y: dy2 } };
     }
 

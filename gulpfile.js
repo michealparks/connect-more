@@ -2,11 +2,16 @@
 
 var gulp = require('gulp');
 
+
+
 // Javascript
 var babel   = require('gulp-babel');
 var concat  = require('gulp-concat');
 var addsrc  = require('gulp-add-src');
 var uglify  = require('gulp-uglify');
+var inline = require('gulp-inline');
+var minifyCss = require('gulp-minify-css');
+
 
 // CSS
 var stylus = require('gulp-stylus');
@@ -18,7 +23,7 @@ var jade = require('gulp-jade');
 // Server
 var webserver = require('gulp-webserver');
 
-gulp.task('javascript', function () {
+gulp.task('javascript', function (done) {
   gulp.src(['app/**/*.js'])
     .pipe(babel({modules: 'amd', moduleIds: true}))
       .on('error', function (e) {
@@ -27,18 +32,19 @@ gulp.task('javascript', function () {
       })
     .pipe(addsrc.prepend('lib/array.js'))
     .pipe(addsrc.prepend('lib/almond.js'))
-    .pipe(addsrc.prepend('lib/react/tappable.js'))
-    .pipe(addsrc.prepend('lib/react-with-addons.js'))
+    .pipe(addsrc.prepend('lib/react-with-addons.min.js'))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('build'));
+  return done();
 });
 
-gulp.task('css', function () {
+gulp.task('css', function (done) {
   gulp.src(['app/**/!(variables|mixins)*.styl'])
     .pipe(addsrc.prepend('app/styl/*(mixins|variables).styl'))
     .pipe(concat('app.styl'))
     .pipe(stylus({use: nib(), compress: true}))
     .pipe(gulp.dest('build'));
+  return done();
 });
 
 gulp.task('jade', function () {
@@ -47,10 +53,13 @@ gulp.task('jade', function () {
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('uglify', function () {
-  gulp.src(['build/app.js'])
-    .pipe(uglify())
-    .pipe(gulp.dest('build'));
+gulp.task('inline', ['javascript', 'css'], function () {
+  gulp.src('index.html')
+    .pipe(inline({
+      base: './',
+      js: uglify({reserved: 'require'}),
+    }))
+    .pipe(gulp.dest('./'));
 });
 
 gulp.task('webserver', function () {
@@ -68,5 +77,5 @@ gulp.task('webserver', function () {
 var mainTasks = ['javascript', 'css', 'jade'];
 
 gulp.task('watch', function () { gulp.watch(['./app/**'], [mainTasks]); });
-gulp.task('build', mainTasks.concat(['uglify', 'gh-pages']));
+gulp.task('build', mainTasks.concat(['inline']));
 gulp.task('default', mainTasks.concat(['webserver', 'watch']));

@@ -7,10 +7,10 @@ body:not(.in-game) #winner-message
 #winner-message
   note()
   box-sizing border-box
-  z-index 1
-  fixed top 50% left 50%
+  z-index 2
+  absolute top 0 left 50%
   size 500px 200px
-  margin -100px -250px
+  margin 0 -250px
   padding 20px
   
   font-family 'Great Vibes', cursive
@@ -19,8 +19,11 @@ body:not(.in-game) #winner-message
   pointer-events none
   opacity 0
   backface-visibility hidden
-  transform rotateY(-720deg) scale(0.2)
+  transform translate(0, 100px)
   transition transform 600ms $ease, opacity 500ms
+  
+  @media (max-device-width: 667px) 
+    transform scale(0.67) translate(0, 100px)
   
   &.active
     pointer-events auto
@@ -28,9 +31,7 @@ body:not(.in-game) #winner-message
     transform none
     
     @media (max-device-width: 667px) 
-      transform scale(0.67)
-  
-  // #message
+      transform scale(0.67) 
       
   [id*='btn-']
     note()
