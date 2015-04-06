@@ -33,7 +33,7 @@ export default React.createClass({
     });
 
     this.initFauxGame();
-    this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
+    this.addPieceId = window.setTimeout(this.addRandomPiece, 500);
   },
 
   initFauxGame() {
@@ -52,7 +52,7 @@ export default React.createClass({
     if (this.state.grid.isFilled() || 
       document.body.classList.contains('in-game')) return;
 
-    this.addPieceId = window.setTimeout(this.addRandomPiece, 100);
+    this.addPieceId = window.setTimeout(this.addRandomPiece, 150);
   },
 
   nextPlayer() {

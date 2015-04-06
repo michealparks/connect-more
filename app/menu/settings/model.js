@@ -99,7 +99,7 @@ export default React.createClass({
           </div>
         </div>
         <div id='btn-ammend' onTouchEnd={this.onSubmit} onClick={hasTouch? null: this.onSubmit}>Ammend registry</div>
-        <div id='btn-sound-state' className={this.state.sound? 'on': 'off'}>
+        <div hidden='true' id='btn-sound-state' className={this.state.sound? 'on': 'off'}>
           <div onTouchEnd={this.toggleSound} onClick={hasTouch? null: this.toggleSound} className='sound-option'>Sound on</div>
           <div onTouchEnd={this.toggleSound} onClick={hasTouch? null: this.toggleSound} className='sound-option'>Sound off</div>
         </div>

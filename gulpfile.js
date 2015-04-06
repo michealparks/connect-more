@@ -2,8 +2,6 @@
 
 var gulp = require('gulp');
 
-
-
 // Javascript
 var babel   = require('gulp-babel');
 var concat  = require('gulp-concat');
@@ -32,7 +30,8 @@ gulp.task('javascript', function (done) {
       })
     .pipe(addsrc.prepend('lib/array.js'))
     .pipe(addsrc.prepend('lib/almond.js'))
-    .pipe(addsrc.prepend('lib/react-with-addons.min.js'))
+    .pipe(addsrc.prepend('lib/react.min.js'))
+    .pipe(addsrc.append('lib/'))
     .pipe(concat('app.js'))
     .pipe(gulp.dest('build'));
   return done();

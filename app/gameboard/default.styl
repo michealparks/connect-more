@@ -1,10 +1,23 @@
+$ease = cubic-bezier(0.075, 0.820, 0.165, 1.000)
+
+@keyframes keyframes-fade
+  0%
+    opacity 0
+  10%
+    opacity 1
+  60%
+    opacity 1
+  100%
+    opacity 0.4
+
 body:not(.in-game)
   #gameboard
     opacity 0
     transform translate(0, 60px)
     
 body.winner
-  transform translate(0, 60px)
+  #gameboard
+    transform translate(0, 60px)
 
 #gameboard
   z-index 1
@@ -17,7 +30,18 @@ body.winner
     text-align center
     font-size 40px
     font-family Great Vibes
-    opacity 0
     
-    &.visible
-      opacity 1
+    &.player-1 > div:nth-child(1)
+    &.player-2 > div:nth-child(2)
+    &.player-3 > div:nth-child(3)
+    &.player-4 > div:nth-child(4)
+      opacity 0.4
+      animation-name keyframes-fade
+      animation-duration 2500ms
+    
+    > div
+      absolute top left
+      width 100%
+      opacity 0
+      transition opacity 400ms
+      

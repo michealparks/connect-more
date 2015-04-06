@@ -19,14 +19,6 @@ export default React.createClass({
         left: `50%`
       },
       hovered: -1,
-      playerClass: '',
-    }
-  },
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.currentPlayer !== nextProps.currentPlayer) {
-      this.setState({playerClass: ''});
-      window.setTimeout(() => this.setState({playerClass: 'visible'}), 400);
     }
   },
 
@@ -64,8 +56,11 @@ export default React.createClass({
         id='gameboard'>
         <div 
           id='current-player' 
-          className={`${this.state.playerClass}`}>
-            {this.props.currentPlayer? this.props.currentPlayer.name: ''}
+          className={`player-${this.props.currentPlayer? this.props.currentPlayer.index + 1: 0}`}>
+            <div>Player 1</div>
+            <div>Player 2</div>
+            <div>Player 3</div>
+            <div>Player 4</div>
         </div>
         {columns}
         <GameboardSurface

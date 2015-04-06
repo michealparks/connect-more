@@ -4,8 +4,10 @@
   user-select none
   display inline-block
   background-color #ddd
-  border-top-left-radius 5px
-  border-top-right-radius 5px
   
   &.hovered
     background-color #ccc
+    
+    .shadow:not(:last-child)
+      transition none
+      background-color #ccc
