@@ -7,11 +7,15 @@ import Grid        from 'grid/model';
 
 class GameController {
   constructor(config) {
-    window.addEventListener('resize', () => {
-      this.tileSize = window.innerWidth/this.grid.columns;
-      if (this.tileSize > 100) this.tileSize = 100;
-      this.update();
-    });
+    window.addEventListener('resize', this.resize.bind(this));
+  }
+
+  resize() {
+    if (! this.grid) return;
+    
+    this.tileSize = window.innerWidth / this.grid.columns;
+    if (this.tileSize > 100) this.tileSize = 100;
+    this.update();
   }
 
   newGame(config) {
@@ -25,25 +29,16 @@ class GameController {
 
     if (this.tileSize > 100) this.tileSize = 100;
 
-    // Sound.play('gameBackground');
     this.update();
   }
 
   onWin() {
     document.body.classList.add('winner');
     this.hasEnded = true;
-    if (this.winningPlayer.type == 'computer') {
-      // Sound.play('loseBackground');
-    } else {
-      // Sound.play('winBackground');
-    }
   }
 
   onPlayerMove(column) {
     if (! this.canMove || this.hasEnded) return;
-
-    // Tone.startTone(Music.majC[_.randomInt(0, Music.majC.length-1)], 50);
-    // Sound.playHitEffect();
 
     this.winningPlayer = this.player
       .beginMove()
@@ -64,7 +59,6 @@ class GameController {
   }
 
   onComputerMove() {
-    // Sound.playHitEffect();
     this.winningPlayer = this.player
       .beginMove()
       .decideMove(this.grid, this.players)

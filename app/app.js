@@ -3,7 +3,6 @@ import {subscribe}    from 'util/mediator';
 import Splashscreen   from 'splashscreen/model';
 import Menu           from 'menu/model';
 import GameController from 'game-controller/model';
-import Sound          from 'sound/model'
 
 const ls = window.localStorage;
 
@@ -78,8 +77,6 @@ function onStartGame() {
 }
 
 function init() {
-  // Sound.play('menuBackground');
-
   React.render(
     <Splashscreen state={'visible'} />,
     document.querySelector('#splashscreen-container')
@@ -87,7 +84,6 @@ function init() {
 
   React.render(
     <Menu 
-      Sound={Sound}
       onStartGame={onStartGame}
       onSettingsChange={onSettingsChange} />,
     document.querySelector('#menu-container')

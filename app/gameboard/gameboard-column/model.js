@@ -11,21 +11,6 @@ export default React.createClass({
     };
   },
 
-  onMouseOver() {
-    const columnData = this.props.data;
-    let i = columnData.length;
-    while (i-- > 0) {
-      if (columnData[i] == -1) {
-        return this.setState({hovered: i});
-      }
-    }
-    this.setState({hovered: -1});
-  },
-
-  onMouseLeave() {
-    this.setState({hovered: -1});
-  },
-
   onMouseUp(e) {
     if (this.props.data.indexOf(-1) == -1) return;
 
@@ -43,8 +28,6 @@ export default React.createClass({
 
     return (
       <div 
-        onMouseOver={hasTouch? null: this.onMouseOver}
-        onMouseLeave={hasTouch? null: this.onMouseLeave}
         onMouseUp={hasTouch? null: this.onMouseUp}
         id={this.props.id}
         style={{

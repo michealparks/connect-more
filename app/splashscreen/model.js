@@ -15,25 +15,25 @@ export default React.createClass({
     const grid = new Grid({rows: 16, nConnect: 99});
     return {
       grid,
-      tileSize: window.innerWidth/grid.columns
+      tileSize: window.innerWidth / grid.columns
     };
   },
 
   componentDidMount() {
-    let onResize = () => {
-      this.setState({
-        grid: this.state.grid,
-        tileSize: window.innerWidth/this.state.grid.columns
-      });
-    };
-
-    window.addEventListener('resize', () => {
-      this.resizeId && window.clearTimeout(this.resizeId);
-      this.resizeId = window.setTimeout(onResize, 400);
-    });
+    window.addEventListener('resize', this.resize);
 
     this.initFauxGame();
     this.addPieceId = window.setTimeout(this.addRandomPiece, 500);
+  },
+
+  resize() {
+    if (document.body.classList.contains('in-game')) return;
+    
+    let tileSize = Math.floor( window.innerWidth / this.state.grid.columns );
+
+    this.setState({
+      tileSize: tileSize
+    });
   },
 
   initFauxGame() {

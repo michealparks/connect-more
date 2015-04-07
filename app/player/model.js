@@ -3,9 +3,6 @@ import {publish} from 'util/mediator';
 
 import _ from 'util/core';
 
-import Tone  from 'sound/tone'
-import Music from 'sound/music'
-
 export default class Player {
   constructor(config) {
     this.index = config.index;

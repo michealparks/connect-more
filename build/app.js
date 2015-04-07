@@ -463,20 +463,16 @@ Array.prototype.last = function(set) {
 
   return this[this.length-1];
 }
-define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "game-controller/model", "sound/model"], function (exports, _utilMediator, _splashscreenModel, _menuModel, _gameControllerModel, _soundModel) {
-  "use strict";
+define('app', ['exports', 'util/mediator', 'splashscreen/model', 'menu/model', 'game-controller/model'], function (exports, _utilMediator, _splashscreenModel, _menuModel, _gameControllerModel) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var subscribe = _utilMediator.subscribe;
+  var _Splashscreen = _interopRequire(_splashscreenModel);
 
-  var Splashscreen = _interopRequire(_splashscreenModel);
+  var _Menu = _interopRequire(_menuModel);
 
-  var Menu = _interopRequire(_menuModel);
-
-  var GameController = _interopRequire(_gameControllerModel);
-
-  var Sound = _interopRequire(_soundModel);
+  var _GameController = _interopRequire(_gameControllerModel);
 
   var ls = window.localStorage;
 
@@ -486,27 +482,27 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
 
   init();
 
-  subscribe("Game::restart", onStartGame);
+  _utilMediator.subscribe('Game::restart', onStartGame);
 
-  subscribe("Game::end", function () {
-    document.body.classList.remove("winner");
-    document.body.classList.remove("in-game");
-    document.querySelector("#menu").classList.add("intro");
+  _utilMediator.subscribe('Game::end', function () {
+    document.body.classList.remove('winner');
+    document.body.classList.remove('in-game');
+    document.querySelector('#menu').classList.add('intro');
 
-    React.unmountComponentAtNode(document.querySelector("#splashscreen-container"));
+    React.unmountComponentAtNode(document.querySelector('#splashscreen-container'));
 
     init();
   });
 
-  window.addEventListener("touchmove", function (e) {
+  window.addEventListener('touchmove', function (e) {
     return e.preventDefault();
   });
 
   onSettingsChange({
-    numConnect: (ls.getItem("connectMore_numConnect") || 4) - 0,
-    numHumans: (ls.getItem("connectMore_numHumans") || 1) - 0,
-    numComputers: (ls.getItem("connectMore_numComputers") || 1) - 0,
-    numPlayers: (ls.getItem("connectMore_numPlayers") || 2) - 0
+    numConnect: (ls.getItem('connectMore_numConnect') || 4) - 0,
+    numHumans: (ls.getItem('connectMore_numHumans') || 1) - 0,
+    numComputers: (ls.getItem('connectMore_numComputers') || 1) - 0,
+    numPlayers: (ls.getItem('connectMore_numPlayers') || 2) - 0
   });
 
   function onSettingsChange() {
@@ -521,7 +517,7 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
       players: (function () {
 
         function Player(i, type) {
-          var difficulty = arguments[2] === undefined ? "" : arguments[2];
+          var difficulty = arguments[2] === undefined ? '' : arguments[2];
 
           this.index = i;
           this.type = type;
@@ -533,11 +529,11 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
         var players = [];
 
         for (var i = 0; i < humans; i++) {
-          players.push(new Player(players.length, "human"));
+          players.push(new Player(players.length, 'human'));
         }
 
         for (var i = 0; i < computers; i++) {
-          players.push(new Player(players.length, "computer", "impossible"));
+          players.push(new Player(players.length, 'computer', 'impossible'));
         }
 
         return players;
@@ -547,177 +543,155 @@ define("app", ["exports", "util/mediator", "splashscreen/model", "menu/model", "
 
   function onStartGame() {
     window.setTimeout(function () {
-      GameController.newGame(gameSettings);
-      document.body.classList.remove("winner");
-      document.body.classList.add("in-game");
+      _GameController.newGame(gameSettings);
+      document.body.classList.remove('winner');
+      document.body.classList.add('in-game');
     }, 100);
   }
 
   function init() {
-    // Sound.play('menuBackground');
+    React.render(React.createElement(_Splashscreen, { state: 'visible' }), document.querySelector('#splashscreen-container'));
 
-    React.render(React.createElement(Splashscreen, { state: "visible" }), document.querySelector("#splashscreen-container"));
-
-    React.render(React.createElement(Menu, {
-      Sound: Sound,
+    React.render(React.createElement(_Menu, {
       onStartGame: onStartGame,
-      onSettingsChange: onSettingsChange }), document.querySelector("#menu-container"));
+      onSettingsChange: onSettingsChange }), document.querySelector('#menu-container'));
   }
 });
 define("brand/model", ["exports"], function (exports) {
   "use strict";
 });
-define("game-controller/model", ["exports", "module", "util/global", "util/mediator", "player/model", "gameboard/model", "grid/model"], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel) {
-  "use strict";
+define('game-controller/model', ['exports', 'module', 'util/global', 'util/mediator', 'player/model', 'gameboard/model', 'grid/model'], function (exports, module, _utilGlobal, _utilMediator, _playerModel, _gameboardModel, _gridModel) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  var GLOBAL = _interopRequire(_utilGlobal);
+  var _GLOBAL = _interopRequire(_utilGlobal);
 
-  var subscribe = _utilMediator.subscribe;
+  var _Player = _interopRequire(_playerModel);
 
-  var Player = _interopRequire(_playerModel);
+  var _Gameboard = _interopRequire(_gameboardModel);
 
-  var Gameboard = _interopRequire(_gameboardModel);
-
-  var Grid = _interopRequire(_gridModel);
+  var _Grid = _interopRequire(_gridModel);
 
   var GameController = (function () {
     function GameController(config) {
-      var _this = this;
-
       _classCallCheck(this, GameController);
 
-      window.addEventListener("resize", function () {
-        _this.tileSize = window.innerWidth / _this.grid.columns;
-        if (_this.tileSize > 100) _this.tileSize = 100;
-        _this.update();
-      });
+      window.addEventListener('resize', this.resize.bind(this));
     }
 
-    _createClass(GameController, {
-      newGame: {
-        value: function newGame(config) {
-          this.grid = new Grid(config.grid);
-          this.tileSize = window.innerWidth / this.grid.columns;
-          this.canMove = true;
-          this.hasEnded = false;
-          this.winningPlayer = false;
-          this.players = config.players.map(function (config) {
-            return new Player(config);
-          });
-          this.player = this.players[0];
+    _createClass(GameController, [{
+      key: 'resize',
+      value: function resize() {
+        if (!this.grid) {
+          return;
+        }this.tileSize = window.innerWidth / this.grid.columns;
+        if (this.tileSize > 100) this.tileSize = 100;
+        this.update();
+      }
+    }, {
+      key: 'newGame',
+      value: function newGame(config) {
+        this.grid = new _Grid(config.grid);
+        this.tileSize = window.innerWidth / this.grid.columns;
+        this.canMove = true;
+        this.hasEnded = false;
+        this.winningPlayer = false;
+        this.players = config.players.map(function (config) {
+          return new _Player(config);
+        });
+        this.player = this.players[0];
 
-          if (this.tileSize > 100) this.tileSize = 100;
+        if (this.tileSize > 100) this.tileSize = 100;
 
-          // Sound.play('gameBackground');
-          this.update();
-        }
-      },
-      onWin: {
-        value: function onWin() {
-          document.body.classList.add("winner");
-          this.hasEnded = true;
-          if (this.winningPlayer.type == "computer") {} else {}
-        }
-      },
-      onPlayerMove: {
-        value: function onPlayerMove(column) {
-          if (!this.canMove || this.hasEnded) {
-            return;
-          } // Tone.startTone(Music.majC[_.randomInt(0, Music.majC.length-1)], 50);
-          // Sound.playHitEffect();
+        this.update();
+      }
+    }, {
+      key: 'onWin',
+      value: function onWin() {
+        document.body.classList.add('winner');
+        this.hasEnded = true;
+      }
+    }, {
+      key: 'onPlayerMove',
+      value: function onPlayerMove(column) {
+        if (!this.canMove || this.hasEnded) {
+          return;
+        }this.winningPlayer = this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
 
-          this.winningPlayer = this.player.beginMove().makeMove(this.grid, column).endMove(this.grid);
+        this.update();
 
-          this.update();
+        if (this.winningPlayer) {
+          return this.onWin();
+        }this.nextPlayer();
+        this.update();
 
-          if (this.winningPlayer) {
-            return this.onWin();
-          }this.nextPlayer();
-          this.update();
-
-          if (this.player.type == "computer") {
-            this.canMove = false;
-            window.setTimeout(this.onComputerMove.bind(this), 1000);
-          }
-        }
-      },
-      onComputerMove: {
-        value: function onComputerMove() {
-          // Sound.playHitEffect();
-          this.winningPlayer = this.player.beginMove().decideMove(this.grid, this.players).endMove(this.grid);
-          this.update();
-
-          if (this.winningPlayer) {
-            return this.onWin();
-          }this.nextPlayer();
-          this.update();
-
-          if (this.player.type == "computer") {
-            window.setTimeout(this.onComputerMove.bind(this), 1000);
-          } else {
-            this.canMove = true;
-          }
-        }
-      },
-      nextPlayer: {
-        value: function nextPlayer() {
-          this.player = this.player.index == this.players.length - 1 ? this.players[0] : this.players[this.player.index + 1];
-          return this.player;
-        }
-      },
-      update: {
-        value: function update() {
-          React.render(React.createElement(Gameboard, {
-            currentPlayer: this.player,
-            winningPlayer: this.winningPlayer,
-            onPlayerMove: this.onPlayerMove.bind(this),
-            grid: this.grid,
-            tileSize: this.tileSize }), document.querySelector("#gameboard-container"));
+        if (this.player.type == 'computer') {
+          this.canMove = false;
+          window.setTimeout(this.onComputerMove.bind(this), 1000);
         }
       }
-    });
+    }, {
+      key: 'onComputerMove',
+      value: function onComputerMove() {
+        this.winningPlayer = this.player.beginMove().decideMove(this.grid, this.players).endMove(this.grid);
+        this.update();
+
+        if (this.winningPlayer) {
+          return this.onWin();
+        }this.nextPlayer();
+        this.update();
+
+        if (this.player.type == 'computer') {
+          window.setTimeout(this.onComputerMove.bind(this), 1000);
+        } else {
+          this.canMove = true;
+        }
+      }
+    }, {
+      key: 'nextPlayer',
+      value: function nextPlayer() {
+        this.player = this.player.index == this.players.length - 1 ? this.players[0] : this.players[this.player.index + 1];
+        return this.player;
+      }
+    }, {
+      key: 'update',
+      value: function update() {
+        React.render(React.createElement(_Gameboard, {
+          currentPlayer: this.player,
+          winningPlayer: this.winningPlayer,
+          onPlayerMove: this.onPlayerMove.bind(this),
+          grid: this.grid,
+          tileSize: this.tileSize }), document.querySelector('#gameboard-container'));
+      }
+    }]);
 
     return GameController;
   })();
 
   module.exports = new GameController();
 });
+define('gameboard/model', ['exports', 'module', 'gameboard/winner-message/model', 'gameboard/gameboard-surface/model', 'gameboard/gameboard-column/model', 'util/mediator'], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
+  'use strict';
 
-// Sound.play('loseBackground');
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-// Sound.play('winBackground');
-define("gameboard/model", ["exports", "module", "gameboard/winner-message/model", "gameboard/gameboard-surface/model", "gameboard/gameboard-column/model", "util/mediator"], function (exports, module, _gameboardWinnerMessageModel, _gameboardGameboardSurfaceModel, _gameboardGameboardColumnModel, _utilMediator) {
-  "use strict";
+  var _WinnerMessage = _interopRequire(_gameboardWinnerMessageModel);
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _GameboardSurface = _interopRequire(_gameboardGameboardSurfaceModel);
 
-  var WinnerMessage = _interopRequire(_gameboardWinnerMessageModel);
+  var _GameboardColumn = _interopRequire(_gameboardGameboardColumnModel);
 
-  var GameboardSurface = _interopRequire(_gameboardGameboardSurfaceModel);
-
-  var GameboardColumn = _interopRequire(_gameboardGameboardColumnModel);
-
-  var publish = _utilMediator.publish;
   module.exports = React.createClass({
-    displayName: "Gameboard",
+    displayName: 'Gameboard',
     column: 0,
 
     getInitialState: function getInitialState() {
-      var width = this.props.grid.columns * this.props.tileSize;
-      var height = this.props.grid.rows * this.props.tileSize;
       return {
-        style: {
-          width: "" + width + "px",
-          height: "" + height + "px",
-          margin: "60px -" + width / 2 + "px",
-          left: "50%"
-        },
         hovered: -1 };
     },
 
@@ -737,8 +711,16 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
     render: function render() {
       var _this = this;
 
+      var width = this.props.grid.columns * this.props.tileSize;
+      var height = this.props.grid.rows * this.props.tileSize;
+      var style = {
+        width: '' + width + 'px',
+        height: '' + height + 'px',
+        margin: '60px -' + width / 2 + 'px'
+      };
+
       var columns = this.props.grid.data.map(function (column, i) {
-        return React.createElement(GameboardColumn, {
+        return React.createElement(_GameboardColumn, {
           onPlayerMove: _this.props.onPlayerMove,
           key: i,
           id: i,
@@ -749,45 +731,45 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
       });
 
       return React.createElement(
-        "section",
+        'section',
         {
           onTouchMove: this.onTouchMove,
           onTouchEnd: this.onTouchEnd,
 
-          style: this.state.style,
-          id: "gameboard" },
+          style: style,
+          id: 'gameboard' },
         React.createElement(
-          "div",
+          'div',
           {
-            id: "current-player",
-            className: "player-" + (this.props.currentPlayer ? this.props.currentPlayer.index + 1 : 0) },
+            id: 'current-player',
+            className: 'player-' + (this.props.currentPlayer ? this.props.currentPlayer.index + 1 : 0) },
           React.createElement(
-            "div",
+            'div',
             null,
-            "Player 1"
+            'Player 1'
           ),
           React.createElement(
-            "div",
+            'div',
             null,
-            "Player 2"
+            'Player 2'
           ),
           React.createElement(
-            "div",
+            'div',
             null,
-            "Player 3"
+            'Player 3'
           ),
           React.createElement(
-            "div",
+            'div',
             null,
-            "Player 4"
+            'Player 4'
           )
         ),
         columns,
-        React.createElement(GameboardSurface, {
+        React.createElement(_GameboardSurface, {
           nConnect: this.props.grid.nConnect,
           width: this.props.grid.columns,
           tileSize: this.props.tileSize }),
-        React.createElement(WinnerMessage, {
+        React.createElement(_WinnerMessage, {
           winningPlayer: this.props.winningPlayer })
       );
     }
@@ -796,9 +778,9 @@ define("gameboard/model", ["exports", "module", "gameboard/winner-message/model"
 define("grid/model", ["exports", "module"], function (exports, module) {
   "use strict";
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var Grid = (function () {
     function Grid() {
@@ -819,200 +801,197 @@ define("grid/model", ["exports", "module"], function (exports, module) {
       }
     }
 
-    _createClass(Grid, {
-      data: {
-        get: function () {
-          return this._data;
-        }
-      },
-      insertPiece: {
-        value: function insertPiece(column, player) {
-          var r = this.rows;
-          while (r-- > 0) {
-            if (this._data[column][r] === -1) {
-              this._data[column][r] = player;
-              break;
-            }
-          }
-          return { x: column, y: r };
-        }
-      },
-      removePiece: {
-        value: function removePiece(column, row) {}
-      },
-      pieceIsInsertable: {
-        value: function pieceIsInsertable(column, row) {
-          return Boolean(this._data[column] && this._data[column][row] && this._data[column][row] === -1 && this._data[column][row + 1] !== -1);
-        }
-      },
-      isFilled: {
-        value: function isFilled() {
-          for (var i = 0, column = undefined; column = this._data[i]; i++) {
-            for (var j = 0, tile = undefined; tile = column[j]; j++) {
-              if (tile === -1) {
-                return false;
-              }
-            }
-          }
-
-          return true;
-        }
-      },
-      canContinueChainInDirection: {
-        value: function canContinueChainInDirection(column, row) {
-          var dir = arguments[2] === undefined ? { x: 0, y: 0 } : arguments[2];
-
-          var grid = this._data;
-
-          return this.pieceIsInsertable(column + dir.x, row + dir.y)
-
-          // if (dir.x == 0) {
-
-          //   return this.pieceIsInsertable(column, row-1);
-
-          // } else if (dir.y == 0) {
-
-          //   return this.pieceIsInsertable(column + dir.x, row);
-
-          // }   
-          ;
-        }
-      },
-      canCompleteChain: {
-        value: function canCompleteChain(column, row, dir, needed) {
-          var grid = this._data;
-
-          for (var i = needed; i > 0; i--) {
-            column = column + dir.x;
-            row = row + dir.y;
-            if (!this.pieceIsInsertable(column, row)) break;
-            needed = needed - 1;
-          }
-
-          return needed == 0;
-        }
-      },
-      findChainContinuingColumn: {
-        value: function findChainContinuingColumn(chain) {
-          var first = chain[0];
-          var m2 = chain[1];
-          var m3 = chain[chain.length - 2];
-          var last = chain[chain.length - 1];
-
-          var dx1 = first.x - m2.x;
-          var dy1 = first.y - m2.y;
-
-          var dx2 = last.x - m3.x;
-          var dy2 = last.y - m3.y;
-
-          if (this.pieceIsInsertable(first.x + dx1, first.y + dy1)) {
-            // if (this.canContinueChainInDirection(first.x, first.y, { x: dx1, y: dy1 })) {
-            return { x: first.x + dx1, y: first.y, dir: { x: dx1, y: dy1 } };
-          }
-
-          if (this.pieceIsInsertable(last.x + dx2, last.y + dy2)) {
-            // if (this.canContinueChainInDirection(last.x, last.y, { x: dx2, y: dy2 })) {
-            return { x: last.x + dx2, y: first.y, dir: { x: dx2, y: dy2 } };
-          }
-
-          return { x: -1, y: -1 };
-        }
-      },
-      makeChainFromPoint: {
-
-        // This method optimizes by only starting
-        // at the last x, y coordinate and checking only
-        // what's necessary
-
-        value: function makeChainFromPoint(x, y, p) {
-          var c = arguments[3] === undefined ? this.nConnect : arguments[3];
-
-          var w = this.columns;
-          var h = this.rows;
-          var grid = this._data;
-
-          // We set matched to 1 since we already know the status of
-          // our current coordinates
-          var m = [{ x: x, y: y }];
-
-          // Vertical test going down
-          for (var i = y + 1; i < h; i++) {
-            if (grid[x][i] == p) m.push({ x: x, y: i });else break;
-          }
-
-          if (m.length >= c) {
-            return m;
-          } else m = [{ x: x, y: y }];
-
-          // Horizontal test moving left and right.
-          for (var i = x - 1; i > -1; i--) {
-            if (grid[i] && grid[i][y] == p) m.unshift({ x: i, y: y });else break;
-          }
-          for (var i = x + 1; i < w; i++) {
-            if (grid[i] && grid[i][y] == p) m.push({ x: i, y: y });else break;
-          }
-
-          if (m.length >= c) {
-            return m;
-          } else m = [{ x: x, y: y }];
-
-          // Diagonal test moving up-left and down-right
-          for (var i = x - 1, j = y - 1; i > -1 && j > -1; i--, j--) {
-            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
-          }
-          for (var i = x + 1, j = y + 1; i < w && j < h; i++, j++) {
-            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
-          }
-
-          if (m.length >= c) {
-            return m;
-          } else m = [{ x: x, y: y }];
-
-          // Diagonal test moving down-right and up-left
-          for (var i = x + 1, j = y - 1; i < w && j > -1; i++, j--) {
-            if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
-          }
-          for (var i = x - 1, j = y + 1; i > -1 && j < h; i--, j++) {
-            if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
-          }
-
-          if (m.length >= c) {
-            return m;
-          } else m = [{ x: x, y: y }];
-
-          return m;
-        }
+    _createClass(Grid, [{
+      key: "data",
+      get: function () {
+        return this._data;
       }
-    });
+    }, {
+      key: "insertPiece",
+      value: function insertPiece(column, player) {
+        var r = this.rows;
+        while (r-- > 0) {
+          if (this._data[column][r] === -1) {
+            this._data[column][r] = player;
+            break;
+          }
+        }
+        return { x: column, y: r };
+      }
+    }, {
+      key: "removePiece",
+      value: function removePiece(column, row) {}
+    }, {
+      key: "pieceIsInsertable",
+      value: function pieceIsInsertable(column, row) {
+        return Boolean(this._data[column] && this._data[column][row] && this._data[column][row] === -1 && this._data[column][row + 1] !== -1);
+      }
+    }, {
+      key: "isFilled",
+      value: function isFilled() {
+        for (var i = 0, column = undefined; column = this._data[i]; i++) {
+          for (var j = 0, tile = undefined; tile = column[j]; j++) {
+            if (tile === -1) {
+              return false;
+            }
+          }
+        }
+
+        return true;
+      }
+    }, {
+      key: "canContinueChainInDirection",
+      value: function canContinueChainInDirection(column, row) {
+        var dir = arguments[2] === undefined ? { x: 0, y: 0 } : arguments[2];
+
+        var grid = this._data;
+
+        return this.pieceIsInsertable(column + dir.x, row + dir.y)
+
+        // if (dir.x == 0) {
+
+        //   return this.pieceIsInsertable(column, row-1);
+
+        // } else if (dir.y == 0) {
+
+        //   return this.pieceIsInsertable(column + dir.x, row);
+
+        // }   
+        ;
+      }
+    }, {
+      key: "canCompleteChain",
+      value: function canCompleteChain(column, row, dir, needed) {
+        var grid = this._data;
+
+        for (var i = needed; i > 0; i--) {
+          column = column + dir.x;
+          row = row + dir.y;
+          if (!this.pieceIsInsertable(column, row)) break;
+          needed = needed - 1;
+        }
+
+        return needed == 0;
+      }
+    }, {
+      key: "findChainContinuingColumn",
+      value: function findChainContinuingColumn(chain) {
+        var first = chain[0];
+        var m2 = chain[1];
+        var m3 = chain[chain.length - 2];
+        var last = chain[chain.length - 1];
+
+        var dx1 = first.x - m2.x;
+        var dy1 = first.y - m2.y;
+
+        var dx2 = last.x - m3.x;
+        var dy2 = last.y - m3.y;
+
+        if (this.pieceIsInsertable(first.x + dx1, first.y + dy1)) {
+          // if (this.canContinueChainInDirection(first.x, first.y, { x: dx1, y: dy1 })) {
+          return { x: first.x + dx1, y: first.y, dir: { x: dx1, y: dy1 } };
+        }
+
+        if (this.pieceIsInsertable(last.x + dx2, last.y + dy2)) {
+          // if (this.canContinueChainInDirection(last.x, last.y, { x: dx2, y: dy2 })) {
+          return { x: last.x + dx2, y: first.y, dir: { x: dx2, y: dy2 } };
+        }
+
+        return { x: -1, y: -1 };
+      }
+    }, {
+      key: "makeChainFromPoint",
+
+      // This method optimizes by only starting
+      // at the last x, y coordinate and checking only
+      // what's necessary
+      value: function makeChainFromPoint(x, y, p) {
+        var c = arguments[3] === undefined ? this.nConnect : arguments[3];
+
+        var w = this.columns;
+        var h = this.rows;
+        var grid = this._data;
+
+        // We set matched to 1 since we already know the status of
+        // our current coordinates
+        var m = [{ x: x, y: y }];
+
+        // Vertical test going down
+        for (var i = y + 1; i < h; i++) {
+          if (grid[x][i] == p) m.push({ x: x, y: i });else break;
+        }
+
+        if (m.length >= c) {
+          return m;
+        } else m = [{ x: x, y: y }];
+
+        // Horizontal test moving left and right.
+        for (var i = x - 1; i > -1; i--) {
+          if (grid[i] && grid[i][y] == p) m.unshift({ x: i, y: y });else break;
+        }
+        for (var i = x + 1; i < w; i++) {
+          if (grid[i] && grid[i][y] == p) m.push({ x: i, y: y });else break;
+        }
+
+        if (m.length >= c) {
+          return m;
+        } else m = [{ x: x, y: y }];
+
+        // Diagonal test moving up-left and down-right
+        for (var i = x - 1, j = y - 1; i > -1 && j > -1; i--, j--) {
+          if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
+        }
+        for (var i = x + 1, j = y + 1; i < w && j < h; i++, j++) {
+          if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
+        }
+
+        if (m.length >= c) {
+          return m;
+        } else m = [{ x: x, y: y }];
+
+        // Diagonal test moving down-right and up-left
+        for (var i = x + 1, j = y - 1; i < w && j > -1; i++, j--) {
+          if (grid[i] && grid[i][j] == p) m.unshift({ x: i, y: j });else break;
+        }
+        for (var i = x - 1, j = y + 1; i > -1 && j < h; i--, j++) {
+          if (grid[i] && grid[i][j] == p) m.push({ x: i, y: j });else break;
+        }
+
+        if (m.length >= c) {
+          return m;
+        } else m = [{ x: x, y: y }];
+
+        return m;
+      }
+    }]);
 
     return Grid;
   })();
 
   module.exports = Grid;
+  ;
 });
-define("menu/model", ["exports", "module", "util/device", "menu/settings/model"], function (exports, module, _utilDevice, _menuSettingsModel) {
-  "use strict";
+define('menu/model', ['exports', 'module', 'util/device', 'menu/settings/model'], function (exports, module, _utilDevice, _menuSettingsModel) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var hasTouch = _utilDevice.hasTouch;
-
-  var Settings = _interopRequire(_menuSettingsModel);
+  var _Settings = _interopRequire(_menuSettingsModel);
 
   module.exports = React.createClass({
-    displayName: "Menu",
+    displayName: 'Menu',
     toSkipIntro: false,
 
     getInitialState: function getInitialState() {
       return {
-        menuState: "intro",
-        introState: ""
+        menuState: 'intro',
+        introState: ''
       };
     },
 
     componentDidMount: function componentDidMount() {
       setTimeout(function () {
-        return document.getElementById("title").classList.add("active");
+        return document.getElementById('title').classList.add('active');
       }, 100);
     },
 
@@ -1022,14 +1001,14 @@ define("menu/model", ["exports", "module", "util/device", "menu/settings/model"]
 
     settings: function settings(e) {
       this.setState({
-        menuState: this.state.menuState == "settings" ? "" : "settings"
+        menuState: this.state.menuState == 'settings' ? '' : 'settings'
       });
     },
 
     skipIntro: function skipIntro() {
       if (!this.toSkipIntro) {
         this.setState({
-          introState: "skip-intro"
+          introState: 'skip-intro'
         });
         this.toSkipIntro = true;
       }
@@ -1037,169 +1016,151 @@ define("menu/model", ["exports", "module", "util/device", "menu/settings/model"]
 
     render: function render() {
       return React.createElement(
-        "div",
+        'div',
         {
-          id: "menu",
-          className: "" + this.state.menuState + " " + this.state.introState,
+          id: 'menu',
+          className: '' + this.state.menuState + ' ' + this.state.introState,
           onTouchEnd: this.skipIntro },
         React.createElement(
-          "div",
-          { id: "title" },
-          "Connect More",
+          'div',
+          { id: 'title' },
+          'Connect More',
           React.createElement(
-            "div",
+            'div',
             {
               onTouchEnd: this.play,
-              onClick: hasTouch ? null : this.play,
-              id: "btn-play" },
-            "I accept"
+              onClick: _utilDevice.hasTouch ? null : this.play,
+              id: 'btn-play' },
+            'I accept'
           ),
           React.createElement(
-            "div",
+            'div',
             {
               onTouchEnd: this.settings,
-              onClick: hasTouch ? null : this.settings,
-              id: "btn-settings" },
-            "Arrangements"
+              onClick: _utilDevice.hasTouch ? null : this.settings,
+              id: 'btn-settings' },
+            'Arrangements'
           )
         ),
-        React.createElement(Settings, { onSubmit: this.settings, onSettingsChange: this.props.onSettingsChange })
+        React.createElement(_Settings, { onSubmit: this.settings, onSettingsChange: this.props.onSettingsChange })
       );
     }
   });
 });
-define("player/model", ["exports", "module", "util/core", "util/mediator", "sound/tone", "sound/music"], function (exports, module, _utilCore, _utilMediator, _soundTone, _soundMusic) {
-  "use strict";
+define('player/model', ['exports', 'module', 'util/core', 'util/mediator'], function (exports, module, _utilCore, _utilMediator) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-  var util = _interopRequire(_utilCore);
+  var _util = _interopRequire(_utilCore);
 
-  var publish = _utilMediator.publish;
-
-  var _ = _interopRequire(_utilCore);
-
-  var Tone = _interopRequire(_soundTone);
-
-  var Music = _interopRequire(_soundMusic);
+  var _2 = _interopRequire(_utilCore);
 
   var Player = (function () {
     function Player(config) {
       _classCallCheck(this, Player);
 
       this.index = config.index;
-      this.name = config.name || "Player " + (this.index + 1);
-      this.type = config.type || "computer";
+      this.name = config.name || 'Player ' + (this.index + 1);
+      this.type = config.type || 'computer';
       this.moves = [];
       this.longestChains = [];
       this.noteIndex = 0;
 
-      if (this.type !== "computer") {
+      if (this.type !== 'computer') {
         return;
       }this.difficulty = config.difficulty;
-      this.errorFactor = 0.1 * util.randomFloat(this.difficulty == "easy" ? 6.66 : this.difficulty == "medium" ? 3.33 : 0, this.difficulty == "easy" ? 10 : this.difficulty == "medium" ? 6.66 : 3.33);
-      this.errorFactor = this.difficulty == "impossible" ? 0 : this.errorFactor;
+      this.errorFactor = 0.1 * _util.randomFloat(this.difficulty == 'easy' ? 6.66 : this.difficulty == 'medium' ? 3.33 : 0, this.difficulty == 'easy' ? 10 : this.difficulty == 'medium' ? 6.66 : 3.33);
+      this.errorFactor = this.difficulty == 'impossible' ? 0 : this.errorFactor;
     }
 
-    _createClass(Player, {
-      beginMove: {
-        value: function beginMove() {
+    _createClass(Player, [{
+      key: 'beginMove',
+      value: function beginMove() {
+        return this;
+      }
+    }, {
+      key: 'makeMove',
+      value: function makeMove(grid, column) {
+        this.moves.push(grid.insertPiece(column, this.index));
+        return this;
+      }
+    }, {
+      key: 'endMove',
+      value: function endMove(grid) {
+        this.longestChains = this.findLongestChain(grid, grid.nConnect);
+
+        if (this.longestChains.filter(function (chain) {
+          return chain.length == grid.nConnect;
+        })[0]) {
           return this;
         }
-      },
-      makeMove: {
-        value: function makeMove(grid, column) {
-          this.moves.push(grid.insertPiece(column, this.index));
-          return this;
-        }
-      },
-      endMove: {
-        value: function endMove(grid) {
-          this.longestChains = this.findLongestChain(grid, grid.nConnect);
+        return false;
+      }
+    }, {
+      key: 'findLongestChain',
+      value: function findLongestChain(grid, max) {
+        var longestChains = [];
+        // We'll move from chains staring at length of two up to the max number
+        for (var i = 2; i < max; i++) {
+          // Now we'll go though all the player's moves
+          for (var j = 0, move = undefined; move = this.moves[j]; j++) {
+            var chain = grid.makeChainFromPoint(move.x, move.y, this.index, i);
+            var spliced = undefined;
 
-          if (this.longestChains.filter(function (chain) {
-            return chain.length == grid.nConnect;
-          })[0]) {
-            return this;
-          }
-          return false;
-        }
-      },
-      findLongestChain: {
-        value: function findLongestChain(grid, max) {
-          var longestChains = [];
-          // We'll move from chains staring at length of two up to the max number
-          for (var i = 2; i < max; i++) {
-            // Now we'll go though all the player's moves
-            for (var j = 0, move = undefined; move = this.moves[j]; j++) {
-              var chain = grid.makeChainFromPoint(move.x, move.y, this.index, i);
-              var spliced = undefined;
-
-              if (!longestChains.length) {
-                longestChains.push(chain);
-              }
-
-              for (var k = 0; k < longestChains.length; k++) {
-                if (chain.length > longestChains[k].length) {
-                  spliced = longestChains.splice(k, 1);
-                }
-              }
-
-              if (spliced) longestChains.push(chain);
+            if (!longestChains.length) {
+              longestChains.push(chain);
             }
-          }
-          return longestChains;
-        }
-      },
-      decideMove: {
 
-        // The Algorithm that the AI follows is pretty simple.
-        // If a step fails it proceeds to the following step.
-        //
-        // (1) It tests its error factor (derived from its difficulty level)
-        //     against a random number and if is within a specified range it
-        //     malfunctions and drops a piece randomly.
-        //
-        // (2) It searches for any player, including itself, that is
-        //     one play away from winning. It then either blocks the
-        //     other player from winning or attempts to win.
-        //
-        // (3) It searches for a chain of pieces that it has previously made
-        //     and adds to it if it is possible and can eventually lead to a
-        //     win scenario.
-        //
-        // (4) It starts a chain by finding a previously laid piece.
-        //
-        // (5) It searches for a chain another player is making and blocks it.
-        //
-        // (6) It places a piece randomly.
-        //
-
-        value: function decideMove(grid, players) {
-          // (1)
-          // if (Math.random() < this.errorFactor) {
-          //   return this.makeMove(grid, util.randomInt(0, grid.columns-1));
-          // }
-
-          // (2)
-          for (var i = 0, player = undefined; player = players[i]; i++) {
-            if (player.index === this.index) break;
-            for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
-              if (chain.length === grid.nConnect - 1) {
-                var data = grid.findChainContinuingColumn(chain);
-                if (data.x > -1) {
-                  return this.makeMove(grid, data.x);
-                }
+            for (var k = 0; k < longestChains.length; k++) {
+              if (chain.length > longestChains[k].length) {
+                spliced = longestChains.splice(k, 1);
               }
             }
-          }
 
-          // (2) Pt. 2
-          for (var j = 0, chain = undefined; chain = this.longestChains[j]; j++) {
+            if (spliced) longestChains.push(chain);
+          }
+        }
+        return longestChains;
+      }
+    }, {
+      key: 'decideMove',
+
+      // The Algorithm that the AI follows is pretty simple.
+      // If a step fails it proceeds to the following step.
+      //
+      // (1) It tests its error factor (derived from its difficulty level)
+      //     against a random number and if is within a specified range it
+      //     malfunctions and drops a piece randomly.
+      //
+      // (2) It searches for any player, including itself, that is
+      //     one play away from winning. It then either blocks the
+      //     other player from winning or attempts to win.
+      //
+      // (3) It searches for a chain of pieces that it has previously made
+      //     and adds to it if it is possible and can eventually lead to a
+      //     win scenario.
+      //
+      // (4) It starts a chain by finding a previously laid piece.
+      //
+      // (5) It searches for a chain another player is making and blocks it.
+      //
+      // (6) It places a piece randomly.
+      //
+      value: function decideMove(grid, players) {
+        // (1)
+        // if (Math.random() < this.errorFactor) {
+        //   return this.makeMove(grid, util.randomInt(0, grid.columns-1));
+        // }
+
+        // (2)
+        for (var i = 0, player = undefined; player = players[i]; i++) {
+          if (player.index === this.index) break;
+          for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
             if (chain.length === grid.nConnect - 1) {
               var data = grid.findChainContinuingColumn(chain);
               if (data.x > -1) {
@@ -1207,9 +1168,43 @@ define("player/model", ["exports", "module", "util/core", "util/mediator", "soun
               }
             }
           }
+        }
 
-          // (3) TODO incomplete
-          for (var i = 0, chain = undefined; chain = this.longestChains[i]; i++) {
+        // (2) Pt. 2
+        for (var j = 0, chain = undefined; chain = this.longestChains[j]; j++) {
+          if (chain.length === grid.nConnect - 1) {
+            var data = grid.findChainContinuingColumn(chain);
+            if (data.x > -1) {
+              return this.makeMove(grid, data.x);
+            }
+          }
+        }
+
+        // (3) TODO incomplete
+        for (var i = 0, chain = undefined; chain = this.longestChains[i]; i++) {
+          if (chain.length > 1) {
+            var data = grid.findChainContinuingColumn(chain);
+            if (data.x > -1) {
+              return this.makeMove(grid, data.x);
+            }
+          }
+        }
+
+        // (4)
+        for (var i = 0, move = undefined; move = this.moves[i]; i++) {
+          for (var _i = 0; _i < 5; _i++) {
+            var x = _i < 2 ? -1 : _i < 3 ? 0 : 1;
+            var y = _i < 1 ? 0 : _i < 4 ? 1 : 0;
+            var canComplete = grid.canCompleteChain(move.x, move.y, { x: x, y: y }, grid.nConnect - 1);
+            if (canComplete) {
+              return this.makeMove(grid, move.x + x);
+            }
+          }
+        }
+
+        // (5)
+        for (var i = 0, player = undefined; player = players[i]; i++) {
+          for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
             if (chain.length > 1) {
               var data = grid.findChainContinuingColumn(chain);
               if (data.x > -1) {
@@ -1217,60 +1212,36 @@ define("player/model", ["exports", "module", "util/core", "util/mediator", "soun
               }
             }
           }
-
-          // (4)
-          for (var i = 0, move = undefined; move = this.moves[i]; i++) {
-            for (var _i = 0; _i < 5; _i++) {
-              var x = _i < 2 ? -1 : _i < 3 ? 0 : 1;
-              var y = _i < 1 ? 0 : _i < 4 ? 1 : 0;
-              var canComplete = grid.canCompleteChain(move.x, move.y, { x: x, y: y }, grid.nConnect - 1);
-              if (canComplete) {
-                return this.makeMove(grid, move.x + x);
-              }
-            }
-          }
-
-          // (5)
-          for (var i = 0, player = undefined; player = players[i]; i++) {
-            for (var j = 0, chain = undefined; chain = player.longestChains[j]; j++) {
-              if (chain.length > 1) {
-                var data = grid.findChainContinuingColumn(chain);
-                if (data.x > -1) {
-                  return this.makeMove(grid, data.x);
-                }
-              }
-            }
-          }
-
-          // (6)
-          return this.makeMove(grid, util.randomInt(0, grid.columns - 1));
         }
+
+        // (6)
+        return this.makeMove(grid, _util.randomInt(0, grid.columns - 1));
       }
-    });
+    }]);
 
     return Player;
   })();
 
   module.exports = Player;
 });
-define("sound/model", ["exports", "module"], function (exports, module) {
-  "use strict";
+define('sound/model', ['exports', 'module'], function (exports, module) {
+  'use strict';
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
 
-  var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var Sound = (function () {
     function Sound(done) {
       _classCallCheck(this, Sound);
 
-      this.menuBackground = new Audio("./build/Brandenburg Concerto No. 3 in G major, BWV1048 I ,  Allegro.mp3");
-      this.gameBackground = new Audio("./build/Brandenburg Concerto No. 4 in G major, BWV1049 I , Allegro.mp3");
-      this.loseBackground = new Audio("./build/Brandenburg Concerto No. 4 in G major, BWV1049 II , Andante.mp3");
-      this.winBackground = new Audio("./build/Brandenburg Concerto No. 1 in F major, BWV1046 III , Allegro.mp3");
+      this.menuBackground = new Audio('./build/Brandenburg Concerto No. 3 in G major, BWV1048 I ,  Allegro.mp3');
+      this.gameBackground = new Audio('./build/Brandenburg Concerto No. 4 in G major, BWV1049 I , Allegro.mp3');
+      this.loseBackground = new Audio('./build/Brandenburg Concerto No. 4 in G major, BWV1049 II , Andante.mp3');
+      this.winBackground = new Audio('./build/Brandenburg Concerto No. 1 in F major, BWV1046 III , Allegro.mp3');
 
-      this.hitEffect = new Audio("./build/Hit.mp3");
-      this.clickEffect = new Audio("./build/Click.mp3");
+      this.hitEffect = new Audio('./build/Hit.mp3');
+      this.clickEffect = new Audio('./build/Click.mp3');
 
       this.menuBackground.volume = 0.4;
       this.gameBackground.volume = 0.4;
@@ -1281,77 +1252,86 @@ define("sound/model", ["exports", "module"], function (exports, module) {
       this.clickEffect.volume = 0.4;
 
       this.playing = null;
-      this.enabled = Boolean(localStorage.getItem("connectMore_soundState") - 0);
+      this.enabled = Boolean(localStorage.getItem('connectMore_soundState') - 0);
     }
 
-    _createClass(Sound, {
-      disable: {
-        value: function disable(bool) {
-          this.enabled = bool;
-          if (this.playing && !this.enabled) {
-            this.fadeOut(this.playing);
-          } else {
-            this.menuBackground.play();
-          }
-        }
-      },
-      play: {
-        value: function play(type) {
-          var _this = this;
-
-          if (!this.enabled) {
-            return;
-          }if (this.playing) {
-            this.fadeOut(this.playing, function () {
-              _this[type].play();
-              _this.playing = _this[type];
-            });
-          } else {
-            this[type].play();
-            this.playing = this[type];
-          }
-        }
-      },
-      fadeOut: {
-        value: function fadeOut(sound, done) {
-          var fade = function () {
-            if (sound.volume - 0.01 <= 0) {
-              sound.pause();
-              sound.currentTime = 0;
-              sound.volume = 0.4;
-              return done && done();
-            }
-
-            if (sound.volume >= 0) sound.volume -= 0.05;
-
-            window.setTimeout(fade, 1000 / 16);
-          };
-
-          window.setTimeout(fade, 1000 / 16);
-        }
-      },
-      playHitEffect: {
-        value: function playHitEffect() {
-          var _this = this;
-
-          window.setTimeout(function () {
-            _this.hitEffect.volume = 0.1;
-            _this.hitEffect.currentTime = 0;
-            _this.hitEffect.play();
-          }, 500);
-          window.setTimeout(function () {
-            _this.hitEffect.volume = 0.05;
-            _this.hitEffect.currentTime = 0;
-            _this.hitEffect.play();
-          }, 900);
-          window.setTimeout(function () {
-            _this.hitEffect.volume = 0.025;
-            _this.hitEffect.currentTime = 0;
-            _this.hitEffect.play();
-          }, 1100);
+    _createClass(Sound, [{
+      key: 'disable',
+      value: function disable(bool) {
+        this.enabled = bool;
+        if (this.playing && !this.enabled) {
+          this.fadeOut(this.playing);
+        } else {
+          this.menuBackground.play();
         }
       }
-    });
+    }, {
+      key: 'play',
+      value: function play(type) {
+        var _this = this;
+
+        if (!this.enabled) {
+          return;
+        }if (this.playing) {
+          this.fadeOut(this.playing, function () {
+            _this[type].play();
+            _this.playing = _this[type];
+          });
+        } else {
+          this[type].play();
+          this.playing = this[type];
+        }
+      }
+    }, {
+      key: 'fadeOut',
+      value: function fadeOut(sound, done) {
+        var fade = (function (_fade) {
+          function fade() {
+            return _fade.apply(this, arguments);
+          }
+
+          fade.toString = function () {
+            return _fade.toString();
+          };
+
+          return fade;
+        })(function () {
+          if (sound.volume - 0.01 <= 0) {
+            sound.pause();
+            sound.currentTime = 0;
+            sound.volume = 0.4;
+            return done && done();
+          }
+
+          if (sound.volume >= 0) sound.volume -= 0.05;
+
+          window.setTimeout(fade, 1000 / 16);
+        });
+
+        window.setTimeout(fade, 1000 / 16);
+      }
+    }, {
+      key: 'playHitEffect',
+      value: function playHitEffect() {
+        var _this2 = this;
+
+        window.setTimeout(function () {
+          _this2.hitEffect.volume = 0.1;
+          _this2.hitEffect.currentTime = 0;
+          _this2.hitEffect.play();
+        }, 500);
+        window.setTimeout(function () {
+          _this2.hitEffect.volume = 0.05;
+          _this2.hitEffect.currentTime = 0;
+          _this2.hitEffect.play();
+        }, 900);
+        window.setTimeout(function () {
+          _this2.hitEffect.volume = 0.025;
+          _this2.hitEffect.currentTime = 0;
+          _this2.hitEffect.play();
+        }, 1100);
+      }
+    }]);
 
     return Sound;
   })();
@@ -1517,15 +1497,12 @@ define("sound/reverb", ["exports", "module"], function (exports, module) {
 
   module.exports = SimpleReverb;
 });
-define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], function (exports, module, _soundTools, _soundReverb) {
-  "use strict";
+define('sound/tone', ['exports', 'module', 'sound/tools', 'sound/reverb'], function (exports, module, _soundTools, _soundReverb) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var audioContext = _soundTools.audioContext;
-  var fixOscillator = _soundTools.fixOscillator;
-
-  var Reverb = _interopRequire(_soundReverb);
+  var _Reverb = _interopRequire(_soundReverb);
 
   // Example showing how to produce a tone using Web Audio API.
   // Load the file webaudio_tools.js before loading this file.
@@ -1534,26 +1511,26 @@ define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], funct
   var amp;
   var distortion;
 
-  var reverb = new Reverb(audioContext, { seconds: 0.5, decay: 6, reverse: 0 });
+  var reverb = new _Reverb(_soundTools.audioContext, { seconds: 0.5, decay: 6, reverse: 0 });
 
   // Create an oscillator and an amplifier.
   // function initAudio() {
   // Use audioContext from webaudio_tools.js
 
-  if (audioContext) {
+  if (_soundTools.audioContext) {
 
-    oscillator = audioContext.createOscillator();
-    fixOscillator(oscillator);
+    oscillator = _soundTools.audioContext.createOscillator();
+    _soundTools.fixOscillator(oscillator);
     oscillator.frequency.value = 440;
-    oscillator.type = "sine";
-    amp = audioContext.createGain();
+    oscillator.type = 'sine';
+    amp = _soundTools.audioContext.createGain();
     amp.gain.value = 0;
 
     // Connect oscillator to amp and amp to the mixer of the audioContext.
     // This is like connecting cables between jacks on a modular synth.
     oscillator.connect(amp);
     amp.connect(reverb.input);
-    reverb.connect(audioContext.destination);
+    reverb.connect(_soundTools.audioContext.destination);
     oscillator.start(0);
     // writeMessageToID( "soundStatus", "<p>Audio initialized.</p>");
   }
@@ -1562,7 +1539,7 @@ define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], funct
 
   // Set the frequency of the oscillator and start it running.
   function startTone(frequency, time) {
-    var now = audioContext.currentTime;
+    var now = _soundTools.audioContext.currentTime;
 
     oscillator.frequency.setValueAtTime(frequency, now);
 
@@ -1572,7 +1549,7 @@ define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], funct
     amp.gain.cancelScheduledValues(now);
     // Anchor beginning of ramp at current value.
     amp.gain.setValueAtTime(amp.gain.value, now);
-    amp.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.005);
+    amp.gain.linearRampToValueAtTime(0.3, _soundTools.audioContext.currentTime + 0.005);
 
     window.setTimeout(stopTone, time);
 
@@ -1580,10 +1557,10 @@ define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], funct
   }
 
   function stopTone() {
-    var now = audioContext.currentTime;
+    var now = _soundTools.audioContext.currentTime;
     amp.gain.cancelScheduledValues(now);
     amp.gain.setValueAtTime(amp.gain.value, now);
-    amp.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+    amp.gain.linearRampToValueAtTime(0, _soundTools.audioContext.currentTime + 0.5);
     // writeMessageToID( "soundStatus", "<p>Stop tone.</p>");
   }
 
@@ -1592,7 +1569,12 @@ define("sound/tone", ["exports", "module", "sound/tools", "sound/reverb"], funct
     stopTone: stopTone
   };
 });
-define("sound/tools", ["exports"], function (exports) {
+define('sound/tools', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, '__esModule', {
+    value: true
+  });
   /*
    * Common tools for use with WebAudio.
    * 
@@ -1616,16 +1598,11 @@ define("sound/tools", ["exports"], function (exports) {
    * limitations under the License.
    */
 
-  "use strict";
-
   exports.createAudioContext = createAudioContext;
 
   // Add missing functions to make the oscillator compatible with the later standard.
   exports.fixOscillator = fixOscillator;
   exports.AudioVisualizer = AudioVisualizer;
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
 
   function createAudioContext() {
     var contextClass = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.oAudioContext;
@@ -1647,12 +1624,12 @@ define("sound/tools", ["exports"], function (exports) {
     };
   })();
   function fixOscillator(osc) {
-    if (typeof osc.start == "undefined") {
+    if (typeof osc.start == 'undefined') {
       osc.start = function (when) {
         osc.noteOn(when);
       };
     }
-    if (typeof osc.stop == "undefined") {
+    if (typeof osc.stop == 'undefined') {
       osc.stop = function (when) {
         osc.noteOff(when);
       };
@@ -1691,7 +1668,7 @@ define("sound/tools", ["exports"], function (exports) {
 
     var width = Math.floor(1 / this.freqs.length, 10);
 
-    drawContext.fillStyle = "hsl(200, 100%, 50%)";
+    drawContext.fillStyle = 'hsl(200, 100%, 50%)';
     // Draw the frequency domain chart.
     for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
       var value = this.freqs[i];
@@ -1704,8 +1681,8 @@ define("sound/tools", ["exports"], function (exports) {
   };
 
   AudioVisualizer.prototype.draw = function () {
-    var canvas = document.querySelector("canvas");
-    var drawContext = canvas.getContext("2d");
+    var canvas = document.querySelector('canvas');
+    var drawContext = canvas.getContext('2d');
     canvas.width = this.width;
     canvas.height = this.height;
 
@@ -1717,7 +1694,7 @@ define("sound/tools", ["exports"], function (exports) {
 
     // Draw the time domain chart.
     //drawContext.beginPath();
-    drawContext.fillStyle = "black";
+    drawContext.fillStyle = 'black';
     drawContext.moveTo(0, this.height / 2);
     var barWidth = this.width / this.analyser.frequencyBinCount;
     for (var i = 0; i < this.analyser.frequencyBinCount; i++) {
@@ -1744,27 +1721,26 @@ define("sound/tools", ["exports"], function (exports) {
     return this.freqs[index];
   };
 });
-define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/model", "player/model", "util/mediator"], function (exports, module, _gameboardModel, _gridModel, _playerModel, _utilMediator) {
-  "use strict";
+define('splashscreen/model', ['exports', 'module', 'gameboard/model', 'grid/model', 'player/model', 'util/mediator'], function (exports, module, _gameboardModel, _gridModel, _playerModel, _utilMediator) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var Gameboard = _interopRequire(_gameboardModel);
+  var _Gameboard = _interopRequire(_gameboardModel);
 
-  var Grid = _interopRequire(_gridModel);
+  var _Grid = _interopRequire(_gridModel);
 
-  var Player = _interopRequire(_playerModel);
+  var _Player = _interopRequire(_playerModel);
 
-  var subscribe = _utilMediator.subscribe;
   module.exports = React.createClass({
-    displayName: "Splashscreen",
+    displayName: 'Splashscreen',
     resizeId: null,
     addPieceId: null,
     players: [],
     player: null,
 
     getInitialState: function getInitialState() {
-      var grid = new Grid({ rows: 16, nConnect: 99 });
+      var grid = new _Grid({ rows: 16, nConnect: 99 });
       return {
         grid: grid,
         tileSize: window.innerWidth / grid.columns
@@ -1772,27 +1748,25 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
     },
 
     componentDidMount: function componentDidMount() {
-      var _this = this;
-
-      var onResize = function () {
-        _this.setState({
-          grid: _this.state.grid,
-          tileSize: window.innerWidth / _this.state.grid.columns
-        });
-      };
-
-      window.addEventListener("resize", function () {
-        _this.resizeId && window.clearTimeout(_this.resizeId);
-        _this.resizeId = window.setTimeout(onResize, 400);
-      });
+      window.addEventListener('resize', this.resize);
 
       this.initFauxGame();
       this.addPieceId = window.setTimeout(this.addRandomPiece, 500);
     },
 
+    resize: function resize() {
+      if (document.body.classList.contains('in-game')) {
+        return;
+      }var tileSize = Math.floor(window.innerWidth / this.state.grid.columns);
+
+      this.setState({
+        tileSize: tileSize
+      });
+    },
+
     initFauxGame: function initFauxGame() {
       this.players = [0, 1, 2, 3].map(function (i) {
-        return new Player({ index: i });
+        return new _Player({ index: i });
       });
       this.player = this.players[0];
     },
@@ -1802,7 +1776,7 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
       this.setState({ grid: this.state.grid });
       this.nextPlayer();
 
-      if (this.state.grid.isFilled() || document.body.classList.contains("in-game")) {
+      if (this.state.grid.isFilled() || document.body.classList.contains('in-game')) {
         return;
       }this.addPieceId = window.setTimeout(this.addRandomPiece, 150);
     },
@@ -1814,9 +1788,9 @@ define("splashscreen/model", ["exports", "module", "gameboard/model", "grid/mode
 
     render: function render() {
       return React.createElement(
-        "div",
-        { id: "splashscreen", className: this.props.state },
-        React.createElement(Gameboard, { grid: this.state.grid, tileSize: this.state.tileSize })
+        'div',
+        { id: 'splashscreen', className: this.props.state },
+        React.createElement(_Gameboard, { grid: this.state.grid, tileSize: this.state.tileSize })
       );
     }
   });
@@ -1844,10 +1818,10 @@ define("util/core", ["exports", "module"], function (exports, module) {
 
   };
 });
-define("util/device", ["exports"], function (exports) {
-  "use strict";
+define('util/device', ['exports'], function (exports) {
+  'use strict';
 
-  Object.defineProperty(exports, "__esModule", {
+  Object.defineProperty(exports, '__esModule', {
     value: true
   });
   var hasTouch = window.ontouchstart !== undefined;
@@ -1855,19 +1829,21 @@ define("util/device", ["exports"], function (exports) {
   var ptrEnabled = navigator.pointerEnabled || navigator.msPointerEnabled;
 
   exports.ptrEnabled = ptrEnabled;
-  var ptrdown = ptrEnabled ? "pointerdown" : hasTouch ? "touchstart" : "mousedown";
+  var ptrdown = ptrEnabled ? 'pointerdown' : hasTouch ? 'touchstart' : 'mousedown';
   exports.ptrdown = ptrdown;
-  var ptrmove = ptrEnabled ? "pointermove" : hasTouch ? "touchmove" : "mousemove";
+  var ptrmove = ptrEnabled ? 'pointermove' : hasTouch ? 'touchmove' : 'mousemove';
   exports.ptrmove = ptrmove;
-  var ptrup = ptrEnabled ? "pointerup" : hasTouch ? "touchend" : "mouseup";
+  var ptrup = ptrEnabled ? 'pointerup' : hasTouch ? 'touchend' : 'mouseup';
+
   exports.ptrup = ptrup;
+  if (!hasTouch) document.body.classList.add('desktop');
 });
 define("util/global", ["exports", "module"], function (exports, module) {
   "use strict";
 
-  var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
   var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+  var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
   var GLOBAL = (function () {
     function GLOBAL() {
@@ -1879,60 +1855,60 @@ define("util/global", ["exports", "module"], function (exports, module) {
       this._player = 0;
     }
 
-    _createClass(GLOBAL, {
-      grid: {
-        get: function () {
-          return this._grid;
-        },
-        set: function (optns) {
-          this._grid.columns = optns.columns || this._grid.columns;
-          this._grid.height = optns.height || this._grid.height;
-          this._grid.tileSize = optns.tileSize || this._grid.tileSize;
-        }
+    _createClass(GLOBAL, [{
+      key: "grid",
+      get: function () {
+        return this._grid;
       },
-      nConnect: {
-        get: function () {
-          return this._nConnect;
-        },
-        set: function (n) {
-          this._nConnect = n;
-        }
-      },
-      nPlayers: {
-        get: function (n) {
-          this._nPlayers = n;
-        }
-      },
-      player: {
-        get: function () {
-          return this._player;
-        }
-      },
-      nextPlayer: {
-        value: function nextPlayer() {
-          this._player = this._player == this._nPlayers - 1 ? 0 : this._player + 1;
-        }
+      set: function (optns) {
+        this._grid.columns = optns.columns || this._grid.columns;
+        this._grid.height = optns.height || this._grid.height;
+        this._grid.tileSize = optns.tileSize || this._grid.tileSize;
       }
-    });
+    }, {
+      key: "nConnect",
+      get: function () {
+        return this._nConnect;
+      },
+      set: function (n) {
+        this._nConnect = n;
+      }
+    }, {
+      key: "nPlayers",
+      get: function (n) {
+        this._nPlayers = n;
+      }
+    }, {
+      key: "player",
+      get: function () {
+        return this._player;
+      }
+    }, {
+      key: "nextPlayer",
+      value: function nextPlayer() {
+        this._player = this._player == this._nPlayers - 1 ? 0 : this._player + 1;
+      }
+    }]);
 
     return GLOBAL;
   })();
 
   module.exports = GLOBAL;
+  ;
 });
-define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) {
-  "use strict";
+define('util/mediator', ['exports', 'util/core'], function (exports, _utilCore) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
+  Object.defineProperty(exports, '__esModule', {
+    value: true
+  });
   exports.publish = publish;
   exports.subscribe = subscribe;
   exports.unsubscribe = unsubscribe;
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
 
-  var util = _interopRequire(_utilCore);
+  var _util = _interopRequire(_utilCore);
 
   var channels = new Map();
   var idProvider = 0;
@@ -1958,50 +1934,33 @@ define("util/mediator", ["exports", "util/core"], function (exports, _utilCore) 
     var channel = channels.get(name);
     var result = false;
 
-    if (!channel) throw new Error("No channel to unsubscribe from.");
+    if (!channel) throw new Error('No channel to unsubscribe from.');
 
     for (var i = 0, il = channel.length; i < il; i++) {
       if (channel[i].id === id) {
-        util.spliceArray(channel, i);
+        _util.spliceArray(channel, i);
         result = true;
         break;
       }
     }
 
-    if (!result) throw new Error("No listener was unsubscribed.");
+    if (!result) throw new Error('No listener was unsubscribed.');
   }
 });
-define("gameboard/gameboard-column/model", ["exports", "module", "util/device", "gameboard/gameboard-column/gameboard-tile/model"], function (exports, module, _utilDevice, _gameboardGameboardColumnGameboardTileModel) {
-  "use strict";
+define('gameboard/gameboard-column/model', ['exports', 'module', 'util/device', 'gameboard/gameboard-column/gameboard-tile/model'], function (exports, module, _utilDevice, _gameboardGameboardColumnGameboardTileModel) {
+  'use strict';
 
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj['default'] : obj; };
 
-  var hasTouch = _utilDevice.hasTouch;
-
-  var GameboardTile = _interopRequire(_gameboardGameboardColumnGameboardTileModel);
+  var _GameboardTile = _interopRequire(_gameboardGameboardColumnGameboardTileModel);
 
   module.exports = React.createClass({
-    displayName: "GameboardColumn",
+    displayName: 'GameboardColumn',
 
     getInitialState: function getInitialState() {
       return {
         hovered: this.props.hovered || -1
       };
-    },
-
-    onMouseOver: function onMouseOver() {
-      var columnData = this.props.data;
-      var i = columnData.length;
-      while (i-- > 0) {
-        if (columnData[i] == -1) {
-          return this.setState({ hovered: i });
-        }
-      }
-      this.setState({ hovered: -1 });
-    },
-
-    onMouseLeave: function onMouseLeave() {
-      this.setState({ hovered: -1 });
     },
 
     onMouseUp: function onMouseUp(e) {
@@ -2014,140 +1973,128 @@ define("gameboard/gameboard-column/model", ["exports", "module", "util/device", 
       var _this = this;
 
       var tiles = this.props.data.map(function (tile, i) {
-        return React.createElement(GameboardTile, {
+        return React.createElement(_GameboardTile, {
           key: i,
-          className: _this.state.hovered == i ? "hovered" : "",
+          className: _this.state.hovered == i ? 'hovered' : '',
           tileSize: _this.props.tileSize,
-          playerClass: tile > -1 ? "p-" + tile : "" });
+          playerClass: tile > -1 ? 'p-' + tile : '' });
       });
 
       return React.createElement(
-        "div",
+        'div',
         {
-          onMouseOver: hasTouch ? null : this.onMouseOver,
-          onMouseLeave: hasTouch ? null : this.onMouseLeave,
-          onMouseUp: hasTouch ? null : this.onMouseUp,
+          onMouseUp: _utilDevice.hasTouch ? null : this.onMouseUp,
           id: this.props.id,
           style: {
-            height: "" + this.props.tileSize * this.props.height + "px",
-            width: "" + this.props.tileSize + "px"
+            height: '' + this.props.tileSize * this.props.height + 'px',
+            width: '' + this.props.tileSize + 'px'
           },
-          className: "gameboard-column " + (this.props.hovered ? "hovered" : "") },
+          className: 'gameboard-column ' + (this.props.hovered ? 'hovered' : '') },
         tiles
       );
     }
   });
 });
-define("gameboard/gameboard-surface/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
-  "use strict";
+define('gameboard/gameboard-surface/model', ['exports', 'module', 'util/device', 'util/mediator'], function (exports, module, _utilDevice, _utilMediator) {
+  'use strict';
 
-  var hasTouch = _utilDevice.hasTouch;
-  var publish = _utilMediator.publish;
   module.exports = React.createClass({
-    displayName: "GameboardSurface",
+    displayName: 'GameboardSurface',
 
     goToMenu: function goToMenu() {
-      publish("Game::end");
+      _utilMediator.publish('Game::end');
     },
 
     render: function render() {
       return React.createElement(
-        "div",
+        'div',
         {
-          id: "gameboard-surface",
+          id: 'gameboard-surface',
           className: this.props.state,
-          style: { width: "" + this.props.width * this.props.tileSize + "px" } },
+          style: { width: '' + this.props.width * this.props.tileSize + 'px' } },
         React.createElement(
-          "div",
-          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
-          "End Game"
+          'div',
+          { onTouchEnd: this.goToMenu, onClick: _utilDevice.hasTouch ? null : this.goToMenu, id: 'btn-menu' },
+          'End Game'
         ),
         React.createElement(
-          "div",
-          { id: "n-connect" },
+          'div',
+          { id: 'n-connect' },
           this.props.nConnect,
-          " to connect."
+          ' to connect.'
         )
       );
     }
   });
 });
-define("gameboard/winner-message/model", ["exports", "module", "util/device", "util/mediator"], function (exports, module, _utilDevice, _utilMediator) {
-  "use strict";
+define('gameboard/winner-message/model', ['exports', 'module', 'util/device', 'util/mediator'], function (exports, module, _utilDevice, _utilMediator) {
+  'use strict';
 
-  var hasTouch = _utilDevice.hasTouch;
-  var publish = _utilMediator.publish;
   module.exports = React.createClass({
-    displayName: "WinnerMessage",
+    displayName: 'WinnerMessage',
 
     playAgain: function playAgain() {
-      publish("Game::restart");
-      this.setState({ className: "", player: "" });
+      _utilMediator.publish('Game::restart');
+      this.setState({ className: '', player: '' });
     },
 
     goToMenu: function goToMenu() {
-      publish("Game::end");
-      this.setState({ className: "", player: "" });
+      _utilMediator.publish('Game::end');
+      this.setState({ className: '', player: '' });
     },
 
     render: function render() {
-      var className = this.props.winningPlayer ? "active" : "";
+      var className = this.props.winningPlayer ? 'active' : '';
       var player = this.props.winningPlayer || {};
 
       return React.createElement(
-        "div",
-        { id: "winner-message", className: className },
+        'div',
+        { id: 'winner-message', className: className },
         React.createElement(
-          "div",
-          { id: "message" },
-          "The title of ",
+          'div',
+          { id: 'message' },
+          'The title of ',
           React.createElement(
-            "span",
-            { className: "champion" },
-            "“Champion”"
+            'span',
+            { className: 'champion' },
+            '“Champion”'
           ),
-          "is hereby awarded to the respected ",
+          'is hereby awarded to the respected ',
           player.type,
-          ",",
+          ',',
           React.createElement(
-            "span",
-            { className: "name" },
+            'span',
+            { className: 'name' },
             player.name
           )
         ),
         React.createElement(
-          "div",
-          { onTouchEnd: this.playAgain, onClick: hasTouch ? null : this.playAgain, id: "btn-play-again" },
-          "Play again"
+          'div',
+          { onTouchEnd: this.playAgain, onClick: _utilDevice.hasTouch ? null : this.playAgain, id: 'btn-play-again' },
+          'Play again'
         ),
         React.createElement(
-          "div",
-          { onTouchEnd: this.goToMenu, onClick: hasTouch ? null : this.goToMenu, id: "btn-menu" },
-          "Return to menu"
+          'div',
+          { onTouchEnd: this.goToMenu, onClick: _utilDevice.hasTouch ? null : this.goToMenu, id: 'btn-menu' },
+          'Return to menu'
         )
       );
     }
   });
 });
-define("menu/settings/model", ["exports", "module", "util/device", "sound/model"], function (exports, module, _utilDevice, _soundModel) {
-  "use strict";
-
-  var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
-
-  var hasTouch = _utilDevice.hasTouch;
-
-  var Sound = _interopRequire(_soundModel);
+define('menu/settings/model', ['exports', 'module', 'util/device'], function (exports, module, _utilDevice) {
+  'use strict';
 
   module.exports = React.createClass({
-    displayName: "Settings",
+    displayName: 'Settings',
 
     getInitialState: function getInitialState() {
       var ls = window.localStorage;
-      var nC = ls.getItem("connectMore_numConnect") || 4;
-      var nH = ls.getItem("connectMore_numHumans") || 1;
-      var nAI = ls.getItem("connectMore_numComputers") || 1;
-      var nP = ls.getItem("connectMore_numPlayers") || 2;
-      var ss = ls.getItem("connectMore_soundState") || 1;
+      var nC = ls.getItem('connectMore_numConnect') || 4;
+      var nH = ls.getItem('connectMore_numHumans') || 1;
+      var nAI = ls.getItem('connectMore_numComputers') || 1;
+      var nP = ls.getItem('connectMore_numPlayers') || 2;
+      var ss = ls.getItem('connectMore_soundState') || 1;
 
       return {
         numConnect: nC - 0,
@@ -2159,13 +2106,13 @@ define("menu/settings/model", ["exports", "module", "util/device", "sound/model"
 
     componentDidUpdate: function componentDidUpdate() {
       var ls = window.localStorage;
-      ls.setItem("connectMore_numConnect", this.state.numConnect);
-      ls.setItem("connectMore_numHumans", this.state.numHumans);
-      ls.setItem("connectMore_numComputers", this.state.numComputers);
-      ls.setItem("connectMore_numPlayers", this.state.numPlayers);
+      ls.setItem('connectMore_numConnect', this.state.numConnect);
+      ls.setItem('connectMore_numHumans', this.state.numHumans);
+      ls.setItem('connectMore_numComputers', this.state.numComputers);
+      ls.setItem('connectMore_numPlayers', this.state.numPlayers);
 
       // Bool to number to string, oh my!
-      ls.setItem("connectMore_soundState", "" + (this.state.sound - 0));
+      ls.setItem('connectMore_soundState', '' + (this.state.sound - 0));
     },
 
     changeConnect: function changeConnect(e) {
@@ -2180,13 +2127,13 @@ define("menu/settings/model", ["exports", "module", "util/device", "sound/model"
       var humans = this.state.numHumans;
 
       switch (e.target.classList[1]) {
-        case "num-human-players":
+        case 'num-human-players':
           this.setState({
             numHumans: num,
             numComputers: comps + num > 4 ? 4 - num : num < 2 && comps < 1 ? 1 : comps
           });
           break;
-        case "num-computer-players":
+        case 'num-computer-players':
           this.setState({
             numHumans: humans + num > 4 ? 4 - num : humans,
             numComputers: num
@@ -2200,7 +2147,6 @@ define("menu/settings/model", ["exports", "module", "util/device", "sound/model"
     toggleSound: function toggleSound() {
       var newState = !this.state.sound;
       this.setState({ sound: newState });
-      Sound.disable(newState);
     },
 
     onSubmit: function onSubmit() {
@@ -2210,144 +2156,144 @@ define("menu/settings/model", ["exports", "module", "util/device", "sound/model"
 
     render: function render() {
       return React.createElement(
-        "div",
-        { id: "settings" },
+        'div',
+        { id: 'settings' },
         React.createElement(
-          "div",
+          'div',
           null,
           React.createElement(
-            "div",
-            { id: "num-connect", className: "container", "data-num": this.state.numConnect },
+            'div',
+            { id: 'num-connect', className: 'container', 'data-num': this.state.numConnect },
             React.createElement(
-              "span",
-              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
-              "3"
+              'span',
+              { onTouchEnd: this.changeConnect, onClick: _utilDevice.hasTouch ? null : this.changeConnect, className: 'option num-connect' },
+              '3'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
-              "4"
+              'span',
+              { onTouchEnd: this.changeConnect, onClick: _utilDevice.hasTouch ? null : this.changeConnect, className: 'option num-connect' },
+              '4'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changeConnect, onClick: hasTouch ? null : this.changeConnect, className: "option num-connect" },
-              "5"
+              'span',
+              { onTouchEnd: this.changeConnect, onClick: _utilDevice.hasTouch ? null : this.changeConnect, className: 'option num-connect' },
+              '5'
             ),
             React.createElement(
-              "span",
-              { className: "title" },
-              "to Connect"
+              'span',
+              { className: 'title' },
+              'to Connect'
             )
           ),
           React.createElement(
-            "div",
-            { id: "num-human-players", className: "container", "data-num": this.state.numHumans },
+            'div',
+            { id: 'num-human-players', className: 'container', 'data-num': this.state.numHumans },
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
-              "1"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-human-players' },
+              '1'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
-              "2"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-human-players' },
+              '2'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
-              "3"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-human-players' },
+              '3'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-human-players" },
-              "4"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-human-players' },
+              '4'
             ),
             React.createElement(
-              "span",
-              { className: "title" },
-              "Human Players"
+              'span',
+              { className: 'title' },
+              'Human Players'
             )
           ),
           React.createElement(
-            "div",
-            { id: "num-computer-players", className: "container", "data-num": this.state.numComputers },
+            'div',
+            { id: 'num-computer-players', className: 'container', 'data-num': this.state.numComputers },
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
-              "0"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-computer-players' },
+              '0'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
-              "1"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-computer-players' },
+              '1'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
-              "2"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-computer-players' },
+              '2'
             ),
             React.createElement(
-              "span",
-              { onTouchEnd: this.changePlayerNum, onClick: hasTouch ? null : this.changePlayerNum, className: "option num-computer-players" },
-              "3"
+              'span',
+              { onTouchEnd: this.changePlayerNum, onClick: _utilDevice.hasTouch ? null : this.changePlayerNum, className: 'option num-computer-players' },
+              '3'
             ),
             React.createElement(
-              "span",
-              { className: "title" },
-              "Computer Players"
+              'span',
+              { className: 'title' },
+              'Computer Players'
             )
           )
         ),
         React.createElement(
-          "div",
-          { id: "btn-ammend", onTouchEnd: this.onSubmit, onClick: hasTouch ? null : this.onSubmit },
-          "Ammend registry"
+          'div',
+          { id: 'btn-ammend', onTouchEnd: this.onSubmit, onClick: _utilDevice.hasTouch ? null : this.onSubmit },
+          'Ammend registry'
         ),
         React.createElement(
-          "div",
-          { hidden: "true", id: "btn-sound-state", className: this.state.sound ? "on" : "off" },
+          'div',
+          { hidden: 'true', id: 'btn-sound-state', className: this.state.sound ? 'on' : 'off' },
           React.createElement(
-            "div",
-            { onTouchEnd: this.toggleSound, onClick: hasTouch ? null : this.toggleSound, className: "sound-option" },
-            "Sound on"
+            'div',
+            { onTouchEnd: this.toggleSound, onClick: _utilDevice.hasTouch ? null : this.toggleSound, className: 'sound-option' },
+            'Sound on'
           ),
           React.createElement(
-            "div",
-            { onTouchEnd: this.toggleSound, onClick: hasTouch ? null : this.toggleSound, className: "sound-option" },
-            "Sound off"
+            'div',
+            { onTouchEnd: this.toggleSound, onClick: _utilDevice.hasTouch ? null : this.toggleSound, className: 'sound-option' },
+            'Sound off'
           )
         )
       );
     }
   });
 });
-define("gameboard/gameboard-column/gameboard-tile/model", ["exports", "module"], function (exports, module) {
-  "use strict";
+define('gameboard/gameboard-column/gameboard-tile/model', ['exports', 'module'], function (exports, module) {
+  'use strict';
 
   module.exports = React.createClass({
-    displayName: "GameboardTile",
+    displayName: 'GameboardTile',
 
     render: function render() {
       return React.createElement(
-        "div",
+        'div',
         {
           style: {
-            width: "" + this.props.tileSize + "px",
-            height: "" + this.props.tileSize + "px"
+            width: '' + this.props.tileSize + 'px',
+            height: '' + this.props.tileSize + 'px'
           },
-          className: "" + this.props.playerClass + " gameboard-tile" },
-        React.createElement("div", {
+          className: '' + this.props.playerClass + ' gameboard-tile' },
+        React.createElement('div', {
           style: {
-            width: "" + (this.props.tileSize - 14) + "px",
-            height: "" + (this.props.tileSize - 14) + "px"
+            width: '' + (this.props.tileSize - 14) + 'px',
+            height: '' + (this.props.tileSize - 14) + 'px'
           },
-          className: "" + this.props.className + " shadow" }),
-        React.createElement("div", {
+          className: '' + this.props.className + ' shadow' }),
+        React.createElement('div', {
           style: {
-            width: "" + (this.props.tileSize - 14) + "px",
-            height: "" + (this.props.tileSize - 14) + "px"
+            width: '' + (this.props.tileSize - 14) + 'px',
+            height: '' + (this.props.tileSize - 14) + 'px'
           },
-          className: "piece " + this.props.playerClass })
+          className: 'piece ' + this.props.playerClass })
       );
     }
   });

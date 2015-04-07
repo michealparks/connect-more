@@ -9,15 +9,7 @@ export default React.createClass({
   column: 0,
 
   getInitialState() {
-    const width = this.props.grid.columns * this.props.tileSize;
-    const height = this.props.grid.rows * this.props.tileSize;
     return {
-      style: {
-        width: `${width}px`,
-        height: `${height}px`,
-        margin: `60px -${width/2}px`,
-        left: `50%`
-      },
       hovered: -1,
     }
   },
@@ -25,19 +17,27 @@ export default React.createClass({
   onTouchMove(e) {
     this.column = Math.floor( e.changedTouches[0].pageX / this.props.tileSize );
     if (this.column !== this.state.hovered) {
-      this.setState({hovered: this.column});
+      this.setState({ hovered: this.column });
     }
   },
 
   onTouchEnd(e) {
     this.column = Math.floor( e.changedTouches[0].pageX / this.props.tileSize );
-    this.setState({hovered: -1});
-    this.props.onPlayerMove(this.column);
+    this.setState({ hovered: -1 });
+    this.props.onPlayerMove( this.column );
   },
 
   render() {
-    const columns = this.props.grid.data.map((column, i) => {
-      return <GameboardColumn 
+    const width = this.props.grid.columns * this.props.tileSize;
+    const height = this.props.grid.rows * this.props.tileSize;
+    const style = { 
+      width: `${width}px`, 
+      height: `${height}px`, 
+      margin: `60px -${width / 2}px`
+    };
+
+    const columns = this.props.grid.data.map((column, i) =>
+      <GameboardColumn 
         onPlayerMove={this.props.onPlayerMove}
         key={i}
         id={i}
@@ -45,17 +45,17 @@ export default React.createClass({
         height={column.length} 
         hovered={this.state.hovered == i}
         tileSize={this.props.tileSize} />
-    });
+    );
 
     return (
-      <section 
+      <section
         onTouchMove={this.onTouchMove}
         onTouchEnd={this.onTouchEnd}
 
-        style={this.state.style} 
+        style={style}
         id='gameboard'>
-        <div 
-          id='current-player' 
+        <div
+          id='current-player'
           className={`player-${this.props.currentPlayer? this.props.currentPlayer.index + 1: 0}`}>
             <div>Player 1</div>
             <div>Player 2</div>

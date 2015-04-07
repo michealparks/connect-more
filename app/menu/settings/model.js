@@ -1,7 +1,5 @@
 import {hasTouch} from 'util/device';
 
-import Sound from 'sound/model';
-
 export default React.createClass({
   displayName: 'Settings',
 
@@ -65,7 +63,6 @@ export default React.createClass({
   toggleSound() {
     const newState = ! this.state.sound;
     this.setState({sound: newState})
-    Sound.disable(newState);
   },
 
   onSubmit() {
