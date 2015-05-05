@@ -1,5 +1,3 @@
-import util from 'util/core';
-
 let channels = new Map();
 let idProvider = 0;
 
@@ -28,7 +26,7 @@ export function unsubscribe (name, id) {
 
   for (let i = 0, il = channel.length; i < il; i++) {
     if (channel[i].id === id) {
-      util.spliceArray(channel, i);
+      channel.splice(i, 1);
       result = true;
       break;
     }

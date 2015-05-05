@@ -3,13 +3,16 @@
 var gulp = require('gulp');
 
 // Javascript
-var babel   = require('gulp-babel');
-var concat  = require('gulp-concat');
-var addsrc  = require('gulp-add-src');
-var uglify  = require('gulp-uglify');
-var inline = require('gulp-inline');
-var minifyCss = require('gulp-minify-css');
 
+var browserify = require('browserify');
+var babel      = require('gulp-babel');
+var babelify   = require('babelify');
+var source     = require('vinyl-source-stream');
+
+var concat = require('gulp-concat');
+var addsrc = require('gulp-add-src');
+var uglify = require('gulp-uglify');
+var inline = require('gulp-inline');
 
 // CSS
 var stylus = require('gulp-stylus');
@@ -22,19 +25,34 @@ var jade = require('gulp-jade');
 var webserver = require('gulp-webserver');
 
 gulp.task('javascript', function (done) {
-  gulp.src(['app/**/*.js'])
-    .pipe(babel({modules: 'amd', moduleIds: true}))
-      .on('error', function (e) {
-        console.error(e.message);
-        this.emit('end');
-      })
-    .pipe(addsrc.prepend('lib/array.js'))
-    .pipe(addsrc.prepend('lib/almond.js'))
-    .pipe(addsrc.prepend('lib/react.min.js'))
-    .pipe(addsrc.append('lib/'))
-    .pipe(concat('app.js'))
-    .pipe(gulp.dest('build'));
+  browserify({
+    paths: ['./app', './node-modules'],
+    entries: './app/app.js',
+    debug: true
+  })
+  .transform(babelify)
+  .bundle()
+  .pipe(source('build.js'))
+
+  // .pipe(addsrc.prepend('lib/array.js'))
+  // .pipe(addsrc.prepend('lib/react.min.js'))
+  // .pipe(concat('build.js'))
+  .pipe(gulp.dest('build'))
+
   return done();
+
+  // gulp.src(['app/**/*.js'])
+  //   .pipe(babel({modules: 'amd', moduleIds: true}))
+  //   .on('error', function (e) {
+  //     console.error(e.message);
+  //     this.emit('end');
+  //   })
+  //   .pipe(addsrc.prepend('lib/array.js'))
+  //   .pipe(addsrc.prepend('lib/almond.js'))
+  //   .pipe(addsrc.prepend('lib/react.min.js'))
+  //   .pipe(concat('app.js'))
+  //   .pipe(gulp.dest('build'));
+  // return done();
 });
 
 gulp.task('css', function (done) {

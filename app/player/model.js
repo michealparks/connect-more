@@ -1,65 +1,64 @@
-import util      from 'util/core';
-import {publish} from 'util/mediator';
-
-import _ from 'util/core';
+import {randomFloat, randomInt} from 'util/core'
 
 export default class Player {
   constructor(config) {
     this.index = config.index;
-    this.name  = config.name || `Player ${this.index+1}`;
+    this.name  = config.name || `Player ${ this.index+1 }`;
     this.type  = config.type || 'computer';
     this.moves = [];
     this.longestChains = [];
     this.noteIndex = 0;
 
-    if (this.type !== 'computer') return;
+    if ( this.type !== 'computer' ) { return; }
 
     this.difficulty = config.difficulty;
-    this.errorFactor = 0.1 * util.randomFloat(
+    this.errorFactor = 0.1 * randomFloat(
       this.difficulty == 'easy'? 6.66: this.difficulty == 'medium'? 3.33: 0,
       this.difficulty == 'easy'? 10.0: this.difficulty == 'medium'? 6.66: 3.33
     );
-    this.errorFactor = this.difficulty == 'impossible'? 0: this.errorFactor;
+    this.errorFactor = ( this.difficulty === 'impossible' )? 0: this.errorFactor;
   }
 
   beginMove() {
     return this;
   }
 
-  makeMove(grid, column) {
-    this.moves.push(grid.insertPiece(column, this.index));
+  makeMove( grid, column ) {
+    this.moves.push( grid.insertPiece( column, this.index ) );
     return this;
   }
 
-  endMove(grid) {
+  endMove( grid ) {
     this.longestChains = this.findLongestChain(grid, grid.nConnect);
 
-    if (this.longestChains.filter(chain => chain.length == grid.nConnect)[0]) {
+    if (this.longestChains.filter( ( chain ) => chain.length === grid.nConnect)[0] ) {
       return this;
     }
     return false;
   }
 
-  findLongestChain(grid, max) {
-    let longestChains = [];
+  findLongestChain( grid, max ) {
+    let longestChains = [ ];
     // We'll move from chains staring at length of two up to the max number
-    for (let i = 2; i < max; i++) {
+    for ( let i = 2; i < max; i++ ) {
       // Now we'll go though all the player's moves
-      for (let j = 0, move; move = this.moves[j]; j++) {
-        const chain = grid.makeChainFromPoint(move.x, move.y, this.index, i);
+      for ( let j = 0, move; move = this.moves[j]; j++ ) {
+        const chain = grid.makeChainFromPoint( move.x, move.y, this.index, i );
         let spliced;
 
-        if (! longestChains.length) {
-          longestChains.push(chain);
+        if ( ! longestChains.length ) {
+          longestChains.push( chain );
         }
 
-        for (let k = 0; k < longestChains.length; k++) {
-          if (chain.length > longestChains[k].length) {
+        for ( let k = 0; k < longestChains.length; k++ ) {
+          if ( chain.length > longestChains[k].length ) {
             spliced = longestChains.splice(k, 1);
           }
         }
 
-        if (spliced) longestChains.push(chain);
+        if ( spliced ) { 
+          longestChains.push( chain );
+        }
       }
     }
     return longestChains;
@@ -89,7 +88,7 @@ export default class Player {
   decideMove(grid, players) {
     // (1)
     // if (Math.random() < this.errorFactor) {
-    //   return this.makeMove(grid, util.randomInt(0, grid.columns-1));
+    //   return this.makeMove(grid, randomInt(0, grid.columns-1));
     // }
 
     // (2)
@@ -155,6 +154,6 @@ export default class Player {
     }
 
     // (6)
-    return this.makeMove(grid, util.randomInt(0, grid.columns-1));
+    return this.makeMove(grid, randomInt(0, grid.columns-1));
   }
 }

@@ -1,0 +1,58 @@
+#titlebar {
+  z-index: 999999;
+  position: relative; 
+  width: 100%;
+  height: 38px;
+  padding: 0px;
+  color: #ffffff;
+  background: #3a3d3d;
+  -webkit-app-region: drag;
+  font-family: 'Source Sans Pro';
+  }
+
+  #titlebar-left { 
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: auto;
+    height: 100%;
+    }
+
+    #titlebar-left #icon { 
+      margin-left: 10px; 
+      margin-top: 10px; 
+      float: left; 
+      height: 12px;
+      width: 12px;
+      border: 3px solid #1ABC9C;
+      border-radius: 100%;
+      background-color: #2FE2BF;
+    }
+
+    #titlebar-left h1 { 
+      float: left; 
+      margin: 0 10px; 
+      font-size: 13px; 
+      font-weight: normal;
+      line-height: 38px;
+    }
+
+  #titlebar-right { 
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    width: auto;
+    height: 100%;
+    }
+
+    a#close-window-button {
+      margin: 10px;
+      display: block;
+      width: 17px;
+      height: 17px;
+      -webkit-app-region: no-drag;
+      }
+
+    a#close-window-button:hover {
+      background-color: #7a7c7c;
+      }

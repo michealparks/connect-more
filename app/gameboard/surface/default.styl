@@ -6,6 +6,8 @@ body.winner
     transform translate(0, 60px)
 
 #gameboard-surface
+  absolute bottom -80px left
+  
   height 80px
   background-color #444
   transition transform 700ms 200ms $ease
@@ -19,11 +21,13 @@ body.winner
     font-size 28px
     
   #btn-menu
+    cursor pointer
     left 0
     height 80px
     line-height 80px
     
   #n-connect
+    cursor default
     right 0
     height 50px
     line-height 60px

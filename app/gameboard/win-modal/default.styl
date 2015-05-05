@@ -22,7 +22,7 @@ body:not(.in-game) #winner-message
   transform translate(0, 100px)
   transition transform 600ms $ease, opacity 500ms
   
-  @media (max-device-width: 667px) 
+  @media (max-width: 667px) 
     transform scale(0.67) translate(0, 100px)
   
   &.active
@@ -30,7 +30,7 @@ body:not(.in-game) #winner-message
     opacity 1
     transform none
     
-    @media (max-device-width: 667px) 
+    @media (max-width: 667px) 
       transform scale(0.67) 
       
   [id*='btn-']

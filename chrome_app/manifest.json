@@ -1,0 +1,26 @@
+{
+  "name": "Connect More",
+  "description": "A connect four game for individuals with class and sophistication.",
+  "manifest_version": 2,  
+  "version": "1.2.0",
+  "minimum_chrome_version": "38",
+  "icons": {
+    "16": "img/icon_16.png",
+    "128": "img/icon_128.png"
+  },
+  "app": {
+    "background": {
+      "scripts": ["js/main.js"]
+    }
+  },
+  "permissions": ["webview", "storage"],
+  "webview": {
+    "partitions": [
+      {
+        "name": "static",
+        "accessible_resources": ["app.html"]
+      }
+    ]
+  },
+  "offline_enabled": true
+}

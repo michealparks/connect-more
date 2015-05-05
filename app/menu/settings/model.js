@@ -16,7 +16,7 @@ export default React.createClass({
       numHumans: nH - 0,
       numComputers: nAI - 0,
       numPlayers: nP - 0,
-      sound: Boolean(ss - 0),
+      sound: Boolean( ss - 0 ),
     };
   },
 
@@ -28,7 +28,7 @@ export default React.createClass({
     ls.setItem('connectMore_numPlayers', this.state.numPlayers);
 
     // Bool to number to string, oh my!
-    ls.setItem('connectMore_soundState', '' + (this.state.sound - 0));
+    ls.setItem( 'connectMore_soundState', '' + ( this.state.sound - 0 ) );
   },
 
   changeConnect(e) {

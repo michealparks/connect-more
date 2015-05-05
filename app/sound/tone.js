@@ -1,5 +1,5 @@
-import {audioContext, fixOscillator} from 'sound/tools';
-import Reverb from 'sound/reverb';
+import {audioContext, fixOscillator} from 'tools';
+import Reverb from 'reverb';
 
 // Example showing how to produce a tone using Web Audio API.
 // Load the file webaudio_tools.js before loading this file.

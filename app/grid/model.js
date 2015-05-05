@@ -1,48 +1,53 @@
 export default class Grid {
-  constructor(config = {}) {
+  constructor( config = {} ) {
     this.columns  = config.columns  || 7;
     this.rows     = config.rows     || 6;
     this.nConnect = config.nConnect || 4;
 
     this._data = [];
-    for (let x = 0, c = this.columns; x < c; x++) {
-      this._data.push([]);
-      for (let y = 0, r = this.rows; y < r; y++) {
-        this._data[x].push(-1);
+
+    for ( let x = 0, c = this.columns; x < c; x++ ) {
+      this._data.push( [ ] );
+
+      for ( let y = 0, r = this.rows; y < r; y++ ) {
+        this._data[ x ].push( -1 );
       }
     }
   }
 
   get data() { return this._data; }
 
-  insertPiece(column, player) {
+  insertPiece( column, player ) {
     let r = this.rows;
-    while (r-- > 0) {
-      if (this._data[column][r] === -1) {
-        this._data[column][r] = player;
+
+    while ( r-- > 0 ) {
+      if ( this._data[ column ][ r ] === -1 ) {
+        this._data[ column ][ r ] = player;
         break;
       }
     }
     return { x: column, y: r };
   }
 
-  removePiece(column, row) {
+  removePiece( column, row ) {
 
   }
 
-  pieceIsInsertable(column, row) {
-    return (Boolean(
-      this._data[column] && 
-      this._data[column][row] &&
-      this._data[column][row] === -1 &&
-      this._data[column][row + 1] !== -1
-    ));
+  pieceIsInsertable( column, row) {
+    return (
+      this._data[ column ] && 
+      this._data[ column ][ row ] &&
+      this._data[ column ][ row ] === -1 &&
+      this._data[ column ][ row + 1 ] !== -1
+    );
   }
 
   isFilled() {
-    for (let i = 0, column; column = this._data[i]; i++) {
-      for (let j = 0, tile; tile = column[j]; j++) {
-        if (tile === -1) return false;
+    for ( let i = 0, column; column = this._data[ i ]; i++ ) {
+      for ( let j = 0, tile; tile = column[j]; j++ ) {
+        if ( tile === -1 ) { 
+          return false; 
+        }
       }
     }
 
@@ -52,30 +57,22 @@ export default class Grid {
   canContinueChainInDirection(column, row, dir = { x: 0, y: 0 }) {
     const grid = this._data;
 
-    return this.pieceIsInsertable(column + dir.x, row + dir.y)
-
-    // if (dir.x == 0) {
-
-    //   return this.pieceIsInsertable(column, row-1);
-
-    // } else if (dir.y == 0) {
-
-    //   return this.pieceIsInsertable(column + dir.x, row);
-
-    // }    
+    return this.pieceIsInsertable( column + dir.x, row + dir.y ) 
   }
 
-  canCompleteChain(column, row, dir, needed) {
+  canCompleteChain( column, row, dir, needed ) {
     const grid = this._data;
 
-    for (let i = needed; i > 0; i--) {
+    for ( let i = needed; i > 0; i-- ) {
       column = column + dir.x;
       row = row + dir.y;
-      if (! this.pieceIsInsertable(column, row)) break;
+
+      if ( ! this.pieceIsInsertable( column, row ) ) { break; }
+
       needed = needed - 1;
     }
 
-    return (needed == 0);
+    return ( needed === 0 );
   }
 
   findChainContinuingColumn(chain) {
@@ -90,13 +87,11 @@ export default class Grid {
     const dx2 = last.x - m3.x;
     const dy2 = last.y - m3.y;
 
-    if (this.pieceIsInsertable(first.x + dx1, first.y + dy1)) {
-    // if (this.canContinueChainInDirection(first.x, first.y, { x: dx1, y: dy1 })) {
+    if ( this.pieceIsInsertable( first.x + dx1, first.y + dy1 ) ) {
       return { x: first.x + dx1, y: first.y, dir: { x: dx1, y: dy1 } };
     }
 
-    if (this.pieceIsInsertable(last.x + dx2, last.y + dy2)) {
-    // if (this.canContinueChainInDirection(last.x, last.y, { x: dx2, y: dy2 })) {
+    if ( this.pieceIsInsertable( last.x + dx2, last.y + dy2 ) ) {
       return { x: last.x + dx2, y: first.y, dir: { x: dx2, y: dy2 } };
     }
 
@@ -106,7 +101,7 @@ export default class Grid {
   // This method optimizes by only starting
   // at the last x, y coordinate and checking only 
   // what's necessary
-  makeChainFromPoint(x, y, p, c = this.nConnect) {
+  makeChainFromPoint( x, y, p, c = this.nConnect ) {
     const w = this.columns;
     const h = this.rows;
     const grid = this._data;

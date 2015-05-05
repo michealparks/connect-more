@@ -14,5 +14,10 @@
     "gulp-webserver": "*",
     "gulp-inline": "*",
     "gulp-minify-css": "*"
+  },
+  "devDependencies": {
+    "babelify": "^6.0.2",
+    "browserify": "^9.0.8",
+    "vinyl-source-stream": "^1.1.0"
   }
 }

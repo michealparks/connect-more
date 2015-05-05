@@ -6,15 +6,17 @@ import GameController from 'game-controller/model';
 
 const ls = window.localStorage;
 
+let globalState = document.body.classList;
+
 let gameSettings;
 
 React.initializeTouchEvents(true)
 
 init();
 
-subscribe('Game::restart', onStartGame);
+subscribe( 'Game::restart', onStartGame );
 
-subscribe('Game::end', () => {
+subscribe( 'Game::end', () => {
   document.body.classList.remove('winner');
   document.body.classList.remove('in-game');
   document.querySelector('#menu').classList.add('intro');
@@ -26,7 +28,7 @@ subscribe('Game::end', () => {
   init();
 });
 
-window.addEventListener('touchmove', e => e.preventDefault());
+window.addEventListener( 'touchmove', e => e.preventDefault() );
 
 onSettingsChange({
   numConnect: (ls.getItem('connectMore_numConnect') || 4) - 0,
@@ -35,7 +37,7 @@ onSettingsChange({
   numPlayers: (ls.getItem('connectMore_numPlayers') || 2) - 0
 });
 
-function onSettingsChange(config = {}) {
+function onSettingsChange( config = {} ) {
   gameSettings = {
     grid: {
       columns: 7,
@@ -44,7 +46,7 @@ function onSettingsChange(config = {}) {
     },
     players: (() => {
 
-      function Player(i, type, difficulty = '') {
+      function Player( i, type, difficulty = '' ) {
         this.index = i;
         this.type = type;
         this.difficulty = difficulty;
@@ -54,12 +56,12 @@ function onSettingsChange(config = {}) {
       const computers = config.numComputers
       const players = [];
 
-      for (let i = 0; i < humans; i++) {
-        players.push(new Player(players.length, 'human'));
+      for ( let i = 0; i < humans; i++ ) {
+        players.push( new Player( players.length, 'human' ) );
       }
 
       for (let i = 0; i < computers; i++) {
-        players.push(new Player(players.length, 'computer', 'impossible'));
+        players.push( new Player( players.length, 'computer', 'impossible' ) );
       }
 
       return players;
@@ -69,23 +71,23 @@ function onSettingsChange(config = {}) {
 }
 
 function onStartGame() {
-  window.setTimeout(() => {
-    GameController.newGame(gameSettings);
-    document.body.classList.remove('winner');
-    document.body.classList.add('in-game');
-  }, 100);
+  window.setTimeout( () => {
+    GameController.newGame( gameSettings );
+    globalState.remove( 'winner' );
+    globalState.add( 'in-game' );
+  }, 100 );
 }
 
 function init() {
   React.render(
-    <Splashscreen state={'visible'} />,
-    document.querySelector('#splashscreen-container')
+    <Splashscreen state = { 'visible' } />,
+    document.querySelector( '#splashscreen-container' )
   );
 
   React.render(
     <Menu 
-      onStartGame={onStartGame}
-      onSettingsChange={onSettingsChange} />,
-    document.querySelector('#menu-container')
+      onStartGame = { onStartGame }
+      onSettingsChange = { onSettingsChange } />,
+    document.querySelector( '#menu-container' )
   );
 }
